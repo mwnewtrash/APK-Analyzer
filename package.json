@@ -1,0 +1,44 @@
+{
+  "name": "apk-analyzer",
+  "version": "1.0.0",
+  "description": "Client-side Android APK / decompiled-source vulnerability analyzer. No upload, runs entirely in the browser.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "map": "node tools/declmap.js",
+    "regen": "node tools/build.mjs && node tools/make-index.cjs",
+    "verify": "node verify-patches.cjs",
+    "test:auto": "node tools/test-auto-dex.cjs && node verify-autodex.cjs",
+    "test:worker": "node tools/test-worker.cjs",
+    "test:history": "node tools/test-history.cjs",
+    "test:resume": "node tools/test-resume.cjs",
+    "test:scanlog": "node tools/test-scanlog.cjs",
+    "test:csv-home": "node tools/test-csv-home.cjs",
+    "test:chips": "node tools/test-chips.cjs",
+    "test:tabs": "node tools/test-tabs.cjs",
+    "test:gaps": "node tools/test-newchecks.cjs && node tools/test-newchecks2.cjs",
+    "test:theme": "node tools/test-theme.cjs",
+    "verify:freeze": "node verify-freeze.cjs",
+    "verify:history": "node verify-history.cjs"
+  },
+  "keywords": [
+    "android",
+    "apk",
+    "security",
+    "vulnerability-scanner",
+    "static-analysis"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "jszip": "^3.10.1",
+    "sql.js": "^1.14.2"
+  },
+  "devDependencies": {
+    "acorn": "^8.19.0",
+    "acorn-walk": "^8.3.5",
+    "vite": "^7.1.7"
+  }
+}

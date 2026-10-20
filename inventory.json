@@ -1,0 +1,1642 @@
+[
+  {
+    "name": "toggleTheme",
+    "kind": "function",
+    "line": 2,
+    "start": 32,
+    "end": 232,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "allSectionsExpanded",
+    "kind": "let",
+    "line": 13,
+    "start": 494,
+    "end": 520,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "allCodeSectionsExpanded",
+    "kind": "let",
+    "line": 14,
+    "start": 534,
+    "end": 564,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 6
+  },
+  {
+    "name": "currentCodeSection",
+    "kind": "let",
+    "line": 15,
+    "start": 578,
+    "end": 603,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 2
+  },
+  {
+    "name": "allDynamicSectionsExpanded",
+    "kind": "let",
+    "line": 16,
+    "start": 676,
+    "end": 709,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "toggleAllSections",
+    "kind": "function",
+    "line": 18,
+    "start": 720,
+    "end": 1322,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "toggleAllCodeSections",
+    "kind": "function",
+    "line": 31,
+    "start": 1332,
+    "end": 1974,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "toggleAllDynamicSections",
+    "kind": "function",
+    "line": 44,
+    "start": 1984,
+    "end": 2672,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "expandAllSections",
+    "kind": "function",
+    "line": 57,
+    "start": 2682,
+    "end": 3166,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "collapseAllSections",
+    "kind": "function",
+    "line": 67,
+    "start": 3176,
+    "end": 3669,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "expandAllCodeSections",
+    "kind": "function",
+    "line": 77,
+    "start": 3679,
+    "end": 4719,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "collapseAllCodeSections",
+    "kind": "function",
+    "line": 96,
+    "start": 4729,
+    "end": 6032,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "expandAllDynamicSectionsInternal",
+    "kind": "function",
+    "line": 122,
+    "start": 6042,
+    "end": 7060,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "collapseAllDynamicSectionsInternal",
+    "kind": "function",
+    "line": 145,
+    "start": 7070,
+    "end": 8092,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "toggleSection",
+    "kind": "function",
+    "line": 168,
+    "start": 8102,
+    "end": 8529,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "toggleSectionChip",
+    "kind": "function",
+    "line": 178,
+    "start": 8601,
+    "end": 8960,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "updateChipCounts",
+    "kind": "function",
+    "line": 189,
+    "start": 9040,
+    "end": 9972,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "toggleCodeSection",
+    "kind": "function",
+    "line": 209,
+    "start": 9982,
+    "end": 10413,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "toggleCodeSectionChip",
+    "kind": "function",
+    "line": 218,
+    "start": 10423,
+    "end": 12572,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "authenticationChecks",
+    "kind": "const",
+    "line": 263,
+    "start": 12622,
+    "end": 18936,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "authorizationChecks",
+    "kind": "const",
+    "line": 309,
+    "start": 18985,
+    "end": 24793,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "featureFlagsChecks",
+    "kind": "const",
+    "line": 358,
+    "start": 24915,
+    "end": 26663,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "hiddenEndpointsChecks",
+    "kind": "const",
+    "line": 369,
+    "start": 26722,
+    "end": 28339,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "authTrustChecks",
+    "kind": "const",
+    "line": 380,
+    "start": 28415,
+    "end": 30178,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "massAssignmentChecks",
+    "kind": "const",
+    "line": 391,
+    "start": 30236,
+    "end": 31741,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "inputValidationChecks",
+    "kind": "const",
+    "line": 401,
+    "start": 31797,
+    "end": 33516,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "businessLogicChecks",
+    "kind": "const",
+    "line": 412,
+    "start": 33574,
+    "end": 35444,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "sqlInjectionChecks",
+    "kind": "const",
+    "line": 428,
+    "start": 35752,
+    "end": 39381,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "nosqlInjectionChecks",
+    "kind": "const",
+    "line": 495,
+    "start": 39446,
+    "end": 42465,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "ssrfVulnerabilityChecks",
+    "kind": "const",
+    "line": 553,
+    "start": 42535,
+    "end": 45995,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "xxeVulnerabilityChecks",
+    "kind": "const",
+    "line": 620,
+    "start": 46070,
+    "end": 48900,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "deserializationVulnerabilityChecks",
+    "kind": "const",
+    "line": 678,
+    "start": 48974,
+    "end": 52582,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "commandInjectionChecks",
+    "kind": "const",
+    "line": 745,
+    "start": 52649,
+    "end": 55655,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "fileHandlingChecks",
+    "kind": "const",
+    "line": 803,
+    "start": 55716,
+    "end": 57356,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "errorHandlingChecks",
+    "kind": "const",
+    "line": 814,
+    "start": 57419,
+    "end": 58893,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "envLeakageChecks",
+    "kind": "const",
+    "line": 824,
+    "start": 58961,
+    "end": 60561,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "cryptoTrustChecks",
+    "kind": "const",
+    "line": 835,
+    "start": 60621,
+    "end": 62269,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "globalAPKData",
+    "kind": "let",
+    "line": 847,
+    "start": 62309,
+    "end": 62394,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 11
+  },
+  {
+    "name": "decompiledSourceData",
+    "kind": "let",
+    "line": 848,
+    "start": 62408,
+    "end": 62509,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 19
+  },
+  {
+    "name": "parseManifestPermissions",
+    "kind": "function",
+    "line": 855,
+    "start": 62808,
+    "end": 66261,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "findAndReadManifest",
+    "kind": "function",
+    "line": 931,
+    "start": 66550,
+    "end": 68968,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "currentFilter",
+    "kind": "let",
+    "line": 988,
+    "start": 68981,
+    "end": 69002,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 3
+  },
+  {
+    "name": "currentCodeFilter",
+    "kind": "let",
+    "line": 989,
+    "start": 69016,
+    "end": 69041,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 1
+  },
+  {
+    "name": "currentEndpointFilterType",
+    "kind": "let",
+    "line": 990,
+    "start": 69055,
+    "end": 69088,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 1
+  },
+  {
+    "name": "currentFlagCategoryFilter",
+    "kind": "let",
+    "line": 991,
+    "start": 69102,
+    "end": 69135,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 3
+  },
+  {
+    "name": "currentStorageCategoryFilter",
+    "kind": "let",
+    "line": 992,
+    "start": 69149,
+    "end": 69185,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 3
+  },
+  {
+    "name": "currentCryptoCategoryFilter",
+    "kind": "let",
+    "line": 993,
+    "start": 69199,
+    "end": 69234,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 3
+  },
+  {
+    "name": "currentLoggingCategoryFilter",
+    "kind": "let",
+    "line": 994,
+    "start": 69248,
+    "end": 69284,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 3
+  },
+  {
+    "name": "currentRootResults",
+    "kind": "let",
+    "line": 995,
+    "start": 69298,
+    "end": 69321,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 12
+  },
+  {
+    "name": "currentEmulatorResults",
+    "kind": "let",
+    "line": 995,
+    "start": 69323,
+    "end": 69350,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 11
+  },
+  {
+    "name": "currentSSLResults",
+    "kind": "let",
+    "line": 995,
+    "start": 69352,
+    "end": 69374,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 11
+  },
+  {
+    "name": "currentFlagResults",
+    "kind": "let",
+    "line": 995,
+    "start": 69376,
+    "end": 69399,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 11
+  },
+  {
+    "name": "currentStorageResults",
+    "kind": "let",
+    "line": 995,
+    "start": 69401,
+    "end": 69427,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 11
+  },
+  {
+    "name": "currentCryptoResults",
+    "kind": "let",
+    "line": 995,
+    "start": 69429,
+    "end": 69454,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 11
+  },
+  {
+    "name": "currentLoggingResults",
+    "kind": "let",
+    "line": 995,
+    "start": 69456,
+    "end": 69482,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 9
+  },
+  {
+    "name": "currentAuthResults",
+    "kind": "let",
+    "line": 996,
+    "start": 69496,
+    "end": 69519,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 8
+  },
+  {
+    "name": "currentAuthzResults",
+    "kind": "let",
+    "line": 996,
+    "start": 69521,
+    "end": 69545,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 6
+  },
+  {
+    "name": "currentFeatureFlagsResults",
+    "kind": "let",
+    "line": 997,
+    "start": 69559,
+    "end": 69590,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentHiddenEndpointsResults",
+    "kind": "let",
+    "line": 997,
+    "start": 69592,
+    "end": 69626,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentAuthTrustResults",
+    "kind": "let",
+    "line": 997,
+    "start": 69628,
+    "end": 69656,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentMassAssignmentResults",
+    "kind": "let",
+    "line": 998,
+    "start": 69670,
+    "end": 69703,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentInputValidationResults",
+    "kind": "let",
+    "line": 998,
+    "start": 69705,
+    "end": 69739,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "currentBusinessLogicResults",
+    "kind": "let",
+    "line": 998,
+    "start": 69741,
+    "end": 69773,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentFileHandlingResults",
+    "kind": "let",
+    "line": 999,
+    "start": 69787,
+    "end": 69818,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentErrorHandlingResults",
+    "kind": "let",
+    "line": 999,
+    "start": 69820,
+    "end": 69852,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentEnvLeakageResults",
+    "kind": "let",
+    "line": 999,
+    "start": 69854,
+    "end": 69883,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentCryptoTrustResults",
+    "kind": "let",
+    "line": 999,
+    "start": 69885,
+    "end": 69915,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 5
+  },
+  {
+    "name": "currentSqlInjectionResults",
+    "kind": "let",
+    "line": 1001,
+    "start": 69983,
+    "end": 70014,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "currentNosqlInjectionResults",
+    "kind": "let",
+    "line": 1001,
+    "start": 70016,
+    "end": 70049,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "currentSsrfResults",
+    "kind": "let",
+    "line": 1001,
+    "start": 70051,
+    "end": 70074,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "currentXxeResults",
+    "kind": "let",
+    "line": 1002,
+    "start": 70088,
+    "end": 70110,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "currentDeserializationResults",
+    "kind": "let",
+    "line": 1002,
+    "start": 70112,
+    "end": 70146,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "currentCommandInjectionResults",
+    "kind": "let",
+    "line": 1002,
+    "start": 70148,
+    "end": 70183,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "extractedEndpoints",
+    "kind": "let",
+    "line": 1003,
+    "start": 70197,
+    "end": 70220,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 15
+  },
+  {
+    "name": "currentEndpointFilter",
+    "kind": "let",
+    "line": 1004,
+    "start": 70234,
+    "end": 70263,
+    "mutable": true,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "currentEndpointSection",
+    "kind": "let",
+    "line": 1005,
+    "start": 70277,
+    "end": 70306,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 2
+  },
+  {
+    "name": "allEndpointSectionsExpanded",
+    "kind": "let",
+    "line": 1006,
+    "start": 70320,
+    "end": 70354,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "analyzedComponents",
+    "kind": "let",
+    "line": 1007,
+    "start": 70368,
+    "end": 70391,
+    "mutable": true,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "customPermissions",
+    "kind": "let",
+    "line": 1008,
+    "start": 70405,
+    "end": 70427,
+    "mutable": true,
+    "reassigned": false,
+    "refs": 8
+  },
+  {
+    "name": "appPermission",
+    "kind": "let",
+    "line": 1009,
+    "start": 70441,
+    "end": 70461,
+    "mutable": true,
+    "reassigned": false,
+    "refs": 8
+  },
+  {
+    "name": "currentPermFilter",
+    "kind": "let",
+    "line": 1010,
+    "start": 70475,
+    "end": 70500,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 1
+  },
+  {
+    "name": "currentComponentTypeFilter",
+    "kind": "let",
+    "line": 1011,
+    "start": 70514,
+    "end": 70548,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 1
+  },
+  {
+    "name": "currentComponentFilter",
+    "kind": "let",
+    "line": 1012,
+    "start": 70562,
+    "end": 70592,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 4
+  },
+  {
+    "name": "analyzedPermComponents",
+    "kind": "let",
+    "line": 1013,
+    "start": 70606,
+    "end": 70633,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 18
+  },
+  {
+    "name": "NORMAL_PERMISSIONS",
+    "kind": "const",
+    "line": 1016,
+    "start": 70721,
+    "end": 71449,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "DANGEROUS_PERMISSIONS",
+    "kind": "const",
+    "line": 1025,
+    "start": 71474,
+    "end": 72761,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "SIGNATURE_PERMISSIONS",
+    "kind": "const",
+    "line": 1040,
+    "start": 72786,
+    "end": 73374,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "SIGNATURE_PRIVILEGED_PERMISSIONS",
+    "kind": "const",
+    "line": 1048,
+    "start": 73399,
+    "end": 73920,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "INTERNAL_SYSTEM_PERMISSIONS",
+    "kind": "const",
+    "line": 1055,
+    "start": 73945,
+    "end": 74314,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "APPOPS_PERMISSIONS",
+    "kind": "const",
+    "line": 1061,
+    "start": 74339,
+    "end": 74571,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "classifyAndroidPermission",
+    "kind": "function",
+    "line": 1067,
+    "start": 74650,
+    "end": 75413,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "resolvePermissionWithRisk",
+    "kind": "function",
+    "line": 1078,
+    "start": 75498,
+    "end": 76885,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 4
+  },
+  {
+    "name": "analyzePermissionsFromManifest",
+    "kind": "function",
+    "line": 1104,
+    "start": 76959,
+    "end": 81237,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "displayPermissionAnalysis",
+    "kind": "function",
+    "line": 1191,
+    "start": 81302,
+    "end": 83045,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "renderPermissionComponents",
+    "kind": "function",
+    "line": 1224,
+    "start": 83115,
+    "end": 86757,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "setComponentFilter",
+    "kind": "function",
+    "line": 1290,
+    "start": 86807,
+    "end": 87246,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "rootChecks",
+    "kind": "const",
+    "line": 1300,
+    "start": 87351,
+    "end": 88387,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "emulatorChecks",
+    "kind": "const",
+    "line": 1309,
+    "start": 88404,
+    "end": 89122,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "sslPinningChecks",
+    "kind": "const",
+    "line": 1317,
+    "start": 89139,
+    "end": 89773,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "flagChecks",
+    "kind": "const",
+    "line": 1324,
+    "start": 89790,
+    "end": 91688,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "localStorageChecks",
+    "kind": "const",
+    "line": 1338,
+    "start": 91705,
+    "end": 99841,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "cryptographyChecks",
+    "kind": "const",
+    "line": 1384,
+    "start": 99858,
+    "end": 101382,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "insecureLoggingChecks",
+    "kind": "const",
+    "line": 1397,
+    "start": 101399,
+    "end": 107472,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "handleAPKSelected",
+    "kind": "function",
+    "line": 1476,
+    "start": 110208,
+    "end": 110566,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "handleDecompiledFolderSelected",
+    "kind": "function",
+    "line": 1485,
+    "start": 110622,
+    "end": 113388,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "handleDroppedDecompiledItems",
+    "kind": "function",
+    "line": 1542,
+    "start": 113452,
+    "end": 114124,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "readDirectoryRecursiveForSource",
+    "kind": "function",
+    "line": 1558,
+    "start": 114134,
+    "end": 114904,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "updateAnalysisHint",
+    "kind": "function",
+    "line": 1576,
+    "start": 114914,
+    "end": 115607,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "startGlobalAnalysis",
+    "kind": "function",
+    "line": 1588,
+    "start": 115672,
+    "end": 116200,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "analyzeDecompiledSourceOnly",
+    "kind": "function",
+    "line": 1603,
+    "start": 116275,
+    "end": 121833,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "navigateTo",
+    "kind": "function",
+    "line": 1687,
+    "start": 121843,
+    "end": 122413,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "analyzeAPKGlobal",
+    "kind": "function",
+    "line": 1698,
+    "start": 122423,
+    "end": 129261,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "displayAllResults",
+    "kind": "function",
+    "line": 1806,
+    "start": 129271,
+    "end": 130117,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "displayMisconfigResults",
+    "kind": "function",
+    "line": 1827,
+    "start": 130127,
+    "end": 134183,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "displayCodeAnalysisResults",
+    "kind": "function",
+    "line": 1881,
+    "start": 134193,
+    "end": 139394,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "renderBackendRiskIndicators",
+    "kind": "function",
+    "line": 1956,
+    "start": 139412,
+    "end": 144516,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 10
+  },
+  {
+    "name": "renderServerSideVulnerabilities",
+    "kind": "function",
+    "line": 2030,
+    "start": 144526,
+    "end": 151131,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 6
+  },
+  {
+    "name": "analyzePatterns",
+    "kind": "function",
+    "line": 2124,
+    "start": 151141,
+    "end": 156553,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 50
+  },
+  {
+    "name": "renderFilteredResults",
+    "kind": "function",
+    "line": 2216,
+    "start": 156563,
+    "end": 159282,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 6
+  },
+  {
+    "name": "renderSection",
+    "kind": "function",
+    "line": 2262,
+    "start": 159292,
+    "end": 159740,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 9
+  },
+  {
+    "name": "createCheckCard",
+    "kind": "function",
+    "line": 2272,
+    "start": 159750,
+    "end": 165257,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "toggleInstances",
+    "kind": "function",
+    "line": 2344,
+    "start": 165275,
+    "end": 165864,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setFilter",
+    "kind": "function",
+    "line": 2359,
+    "start": 165874,
+    "end": 166312,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setFlagCategoryFilter",
+    "kind": "function",
+    "line": 2368,
+    "start": 166322,
+    "end": 166698,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setStorageCategoryFilter",
+    "kind": "function",
+    "line": 2375,
+    "start": 166708,
+    "end": 167329,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setCryptoCategoryFilter",
+    "kind": "function",
+    "line": 2386,
+    "start": 167339,
+    "end": 168057,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setLoggingCategoryFilter",
+    "kind": "function",
+    "line": 2398,
+    "start": 168067,
+    "end": 168596,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "extractEndpoints",
+    "kind": "function",
+    "line": 2412,
+    "start": 168637,
+    "end": 171549,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "displayEndpointResults",
+    "kind": "function",
+    "line": 2468,
+    "start": 171559,
+    "end": 174086,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "renderEndpoints",
+    "kind": "function",
+    "line": 2510,
+    "start": 174096,
+    "end": 177229,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "filterEndpointsBySearch",
+    "kind": "function",
+    "line": 2574,
+    "start": 177239,
+    "end": 177296,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "toggleEndpointSectionsExpandCollapse",
+    "kind": "function",
+    "line": 2576,
+    "start": 177314,
+    "end": 177733,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "expandAllEndpointSections",
+    "kind": "function",
+    "line": 2587,
+    "start": 177751,
+    "end": 178149,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "collapseAllEndpointSections",
+    "kind": "function",
+    "line": 2596,
+    "start": 178167,
+    "end": 178794,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "toggleEndpointSectionChip",
+    "kind": "function",
+    "line": 2611,
+    "start": 178812,
+    "end": 179911,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setCodeFilter",
+    "kind": "function",
+    "line": 2638,
+    "start": 179929,
+    "end": 180362,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setEndpointFilter",
+    "kind": "function",
+    "line": 2646,
+    "start": 180380,
+    "end": 180849,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "exportEndpoints",
+    "kind": "function",
+    "line": 2654,
+    "start": 180867,
+    "end": 181198,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setPermFilter",
+    "kind": "function",
+    "line": 2662,
+    "start": 181208,
+    "end": 181524,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "setComponentTypeFilter",
+    "kind": "function",
+    "line": 2668,
+    "start": 181534,
+    "end": 181860,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "exportPermissions",
+    "kind": "function",
+    "line": 2674,
+    "start": 181870,
+    "end": 181933,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "resetGlobalAnalyzer",
+    "kind": "function",
+    "line": 2676,
+    "start": 181943,
+    "end": 183901,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "copyToClipboard",
+    "kind": "function",
+    "line": 2708,
+    "start": 183911,
+    "end": 184354,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "formatFileSize",
+    "kind": "function",
+    "line": 2718,
+    "start": 184364,
+    "end": 184668,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "escapeHtml",
+    "kind": "function",
+    "line": 2725,
+    "start": 184678,
+    "end": 184840,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 43
+  },
+  {
+    "name": "dynamicAnalysisData",
+    "kind": "let",
+    "line": 2733,
+    "start": 184933,
+    "end": 185096,
+    "mutable": true,
+    "reassigned": true,
+    "refs": 25
+  },
+  {
+    "name": "handleDroppedItems",
+    "kind": "function",
+    "line": 2768,
+    "start": 186490,
+    "end": 187068,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "readDirectoryRecursive",
+    "kind": "function",
+    "line": 2783,
+    "start": 187078,
+    "end": 187830,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "analyzeDynamicFolder",
+    "kind": "function",
+    "line": 2801,
+    "start": 187840,
+    "end": 190945,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 2
+  },
+  {
+    "name": "sensitivePatterns",
+    "kind": "const",
+    "line": 2868,
+    "start": 191010,
+    "end": 191822,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 14
+  },
+  {
+    "name": "analyzeSharedPreferences",
+    "kind": "function",
+    "line": 2882,
+    "start": 191833,
+    "end": 195183,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "analyzeSQLiteDatabases",
+    "kind": "function",
+    "line": 2934,
+    "start": 195193,
+    "end": 199997,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "analyzeOtherFiles",
+    "kind": "function",
+    "line": 3014,
+    "start": 200007,
+    "end": 209979,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "maskValue",
+    "kind": "function",
+    "line": 3173,
+    "start": 209989,
+    "end": 210171,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 6
+  },
+  {
+    "name": "displayDynamicResults",
+    "kind": "function",
+    "line": 3178,
+    "start": 210181,
+    "end": 211126,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "renderSharedPrefsResults",
+    "kind": "function",
+    "line": 3200,
+    "start": 211136,
+    "end": 215909,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "renderSQLiteResults",
+    "kind": "function",
+    "line": 3267,
+    "start": 215919,
+    "end": 219928,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "renderFilesResults",
+    "kind": "function",
+    "line": 3330,
+    "start": 219938,
+    "end": 222376,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "renderSecurityIssues",
+    "kind": "function",
+    "line": 3369,
+    "start": 222386,
+    "end": 228320,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 1
+  },
+  {
+    "name": "toggleDynamicSection",
+    "kind": "function",
+    "line": 3475,
+    "start": 228330,
+    "end": 229240,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "toggleDynamicInstances",
+    "kind": "function",
+    "line": 3498,
+    "start": 229250,
+    "end": 229797,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "expandAllDynamicSections",
+    "kind": "function",
+    "line": 3512,
+    "start": 229807,
+    "end": 230770,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "collapseAllDynamicSections",
+    "kind": "function",
+    "line": 3534,
+    "start": 230780,
+    "end": 231746,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  },
+  {
+    "name": "resetDynamicAnalysis",
+    "kind": "function",
+    "line": 3556,
+    "start": 231756,
+    "end": 232423,
+    "mutable": false,
+    "reassigned": false,
+    "refs": 0
+  }
+]

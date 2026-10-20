@@ -1,0 +1,2555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Security Analyzer</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.3" integrity="sha384-aJ9rL4k6lF+91guGvUFVSkpIcge7Zd9EiI4TQDLoK9kFaFJgKHgjEXVvG/qA5COj" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" integrity="sha384-+mbV2IY1Zk/X1p/nWllGySJSUN8uMs+gUAN10Or95UBH0fpj6GfKgPmgC5EXieXG" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@300;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #060a1c;
+            --bg-secondary: #0e1430;
+            --glass-bg: rgba(148, 163, 184, 0.06);
+            --glass-border: rgba(148, 163, 184, 0.14);
+            --text-primary: #e8ecf5;
+            --text-secondary: #8b93b0;
+            --accent: #2dd4bf;
+            --accent-ink: #052e2b;
+        }
+        
+        .dark-mode {
+            --bg-primary: #040816;
+            --bg-secondary: #0a1028;
+            --glass-bg: rgba(148, 163, 184, 0.05);
+            --glass-border: rgba(148, 163, 184, 0.12);
+            --text-primary: #e8ecf5;
+            --text-secondary: #8b93b0;
+        }
+        
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: all 0.3s ease;
+        }
+        .font-display, .section-content-title h3, .section-header-title {
+            font-family: 'Montserrat', 'Inter', sans-serif;
+            letter-spacing: -0.01em;
+        }
+        .font-mono, code, pre, kbd, [data-scan-console] {
+            font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace !important;
+        }
+        .section-chip-count, [data-scan-pct], [data-scan-elapsed] {
+            font-family: 'JetBrains Mono', ui-monospace, monospace;
+            font-variant-numeric: tabular-nums;
+        }
+        #totalChecksDisplay, #detectedChecksDisplay, #notDetectedChecksDisplay, #securityScore {
+            font-family: 'Montserrat', 'Inter', sans-serif;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+        .gradient-bg {
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%);
+        }
+        .dark-mode .gradient-bg {
+            background: linear-gradient(135deg, #09090b 0%, #18181b 50%, #09090b 100%);
+        }
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.25rem;
+        }
+        .dark-mode .glass {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .upload-zone {
+            border: 2px dashed rgba(45, 212, 191, 0.35);
+            transition: all 0.3s ease;
+            border-radius: 1.5rem;
+        }
+        .check-card {
+            transition: all 0.3s ease;
+            border-radius: 1.125rem;
+        }
+        .check-card:hover {
+            transform: translateY(-2px);
+        }
+        .pulse-ring {
+            animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.8); opacity: 1; }
+            80%, 100% { transform: scale(2); opacity: 0; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .progress-bar {
+            background: linear-gradient(90deg, #14b8a6, #06b6d4, #14b8a6);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            box-shadow: 0 0 14px rgba(45, 212, 191, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+            position: relative;
+            overflow: hidden;
+        }
+        @keyframes shimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+            transform: translateX(-100%);
+            animation: bar-sheen 1.8s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes bar-sheen {
+            0% { transform: translateX(-100%); }
+            60%, 100% { transform: translateX(100%); }
+        }
+        .scan-stage { display: flex; align-items: center; gap: 0.5rem; opacity: 0.4; flex-shrink: 0; transition: opacity 0.3s ease; }
+        .scan-dot {
+            width: 1.75rem; height: 1.75rem; border-radius: 9999px; flex-shrink: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.7rem;
+            border: 1px solid rgba(148, 163, 184, 0.3); color: #8b93b0;
+            background: transparent;
+        }
+        .scan-stage-label { font-size: 0.75rem; color: #8b93b0; white-space: nowrap; }
+        .scan-sub { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 0.7rem; color: #2dd4bf; margin-left: 0.375rem; }
+        .scan-stage.active { opacity: 1; }
+        .scan-stage.active .scan-dot { border-color: rgba(45, 212, 191, 0.7); color: #5eead4; box-shadow: 0 0 12px rgba(45, 212, 191, 0.35); }
+        .scan-stage.active .scan-stage-label { color: #edeff7; }
+        .scan-stage.done { opacity: 0.9; }
+        .scan-stage.done .scan-dot { border-color: rgba(45, 212, 191, 0.5); background: rgba(45, 212, 191, 0.12); color: #5eead4; }
+        .scan-link { flex: 1 1 0%; min-width: 1rem; height: 1px; background: rgba(148, 163, 184, 0.18); }
+        .scan-link.done { background: rgba(45, 212, 191, 0.55); }
+        .spokes-loader {
+            width: 2.75rem; height: 2.75rem; flex-shrink: 0;
+            animation-name: loading-ui-spokes-spin;
+            animation-duration: var(--duration, 1s);
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+        }
+        @keyframes loading-ui-spokes-spin { to { transform: rotate(360deg); } }
+        @media (prefers-reduced-motion: reduce) { .spokes-loader { animation: none; } }
+        /* Scroll areas (ReUI c-scroll-area-1 port): thin transparent-track
+           scrollbars with a themed thumb. Covers the scan terminal, finding
+           instance drawers, and capped result lists. */
+        [data-scan-console],
+        .instances-container.show,
+        .max-h-60.overflow-y-auto {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(45, 212, 191, 0.35) transparent;
+        }
+        [data-scan-console]::-webkit-scrollbar,
+        .instances-container.show::-webkit-scrollbar,
+        .max-h-60.overflow-y-auto::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+            background: transparent;
+        }
+        [data-scan-console]::-webkit-scrollbar-track,
+        .instances-container.show::-webkit-scrollbar-track,
+        .max-h-60.overflow-y-auto::-webkit-scrollbar-track { background: transparent; }
+        [data-scan-console]::-webkit-scrollbar-thumb,
+        .instances-container.show::-webkit-scrollbar-thumb,
+        .max-h-60.overflow-y-auto::-webkit-scrollbar-thumb {
+            background: rgba(45, 212, 191, 0.35);
+            border-radius: 9999px;
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        [data-scan-console]::-webkit-scrollbar-thumb:hover,
+        .instances-container.show::-webkit-scrollbar-thumb:hover,
+        .max-h-60.overflow-y-auto::-webkit-scrollbar-thumb:hover {
+            background: rgba(45, 212, 191, 0.6);
+            border: 2px solid transparent;
+            background-clip: padding-box;
+        }
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            border-radius: 0.875rem;
+        }
+        .dark-mode .filter-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .dark-mode .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+        /* (violet filter-btn base removed: teal system rule below governs) */
+        .filter-btn.active#filterDetected, 
+        .filter-btn.active#codeFilterDetected,
+        .filter-btn.active#endpointFilterDetected,
+        .filter-btn.active#endpointFilterByCategory {
+            background: linear-gradient(135deg, #10b981, #059669);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+        }
+        .filter-btn.active#filterNotDetected,
+        .filter-btn.active#codeFilterNotDetected,
+        .filter-btn.active#endpointFilterNotDetected {
+            background: linear-gradient(135deg, #f43f5e, #e11d48);
+            box-shadow: 0 4px 15px rgba(244, 63, 94, 0.4);
+        }
+        .section-divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(45, 212, 191, 0.25), transparent);
+        }
+        .nav-link {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #2dd4bf, #06b6d4);
+            transition: width 0.3s ease;
+        }
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+        .nav-link.active {
+            color: #5eead4;
+        }
+        .endpoint-card, .component-card {
+            transition: all 0.3s ease;
+        }
+        .endpoint-card:hover, .component-card:hover {
+            transform: translateX(4px);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .copy-btn {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .endpoint-card:hover .copy-btn, .component-card:hover .copy-btn {
+            opacity: 1;
+        }
+        .category-tag {
+            font-size: 0.65rem;
+            padding: 2px 8px;
+            border-radius: 9999px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .page { display: none; }
+        .page.active { display: block; }
+        .risk-high { background: rgba(239, 68, 68, 0.2); border-color: rgba(239, 68, 68, 0.5); }
+        .risk-medium { background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); }
+        .risk-low { background: rgba(34, 197, 94, 0.2); border-color: rgba(34, 197, 94, 0.5); }
+        .risk-badge-high { background: #ef4444; }
+        .risk-badge-medium { background: #f59e0b; }
+        .risk-badge-low { background: #22c55e; }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .collapsible-content.expanded {
+            max-height: 5000px;
+        }
+        .section-header {
+            display: grid;
+            grid-template-columns: 48px 1fr 32px;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(148, 163, 184, 0.06);
+            border: 1px solid rgba(148, 163, 184, 0.14);
+            border-left: 4px solid rgba(45, 212, 191, 0.5);
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            min-height: 64px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25), 
+                        0 2px 4px rgba(0, 0, 0, 0.1),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+        }
+        #page-codeanalysis .section-header {
+            align-items: start;
+        }
+        .section-header:hover {
+            background: rgba(45, 212, 191, 0.07);
+            border-color: rgba(45, 212, 191, 0.35);
+            box-shadow: 0 8px 25px rgba(45, 212, 191, 0.15), 
+                        0 4px 8px rgba(0, 0, 0, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+        .section-header:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2), 
+                        0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        /* (violet dark headers removed: flat slate rule governs) */
+        .section-header-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+        .section-header:hover .section-header-icon {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+        .section-header-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.4;
+        }
+        #page-codeanalysis .section-header-title {
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+        }
+        .section-header-chevron {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        .section-header:hover .section-header-chevron {
+            background: rgba(45, 212, 191, 0.15);
+        }
+        .section-header-chevron.expanded {
+            transform: rotate(180deg);
+        }
+        .section-header-chevron svg {
+            transition: all 0.3s ease;
+        }
+        .section-header:hover .section-header-chevron svg {
+            color: #5eead4;
+        }
+        /* Chip-style section headers for horizontal layout */
+        .section-headers-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            .section-headers-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .section-headers-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        .section-chip {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.625rem;
+            padding: 0.875rem 1rem;
+            height: 56px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .dark-mode .section-chip {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        
+        /* Code Analysis Page Specific Styles */
+        #page-codeanalysis .section-chip-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.625rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        #page-codeanalysis .section-chip-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        #page-codeanalysis .section-chip-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: white;
+            white-space: nowrap;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #page-codeanalysis .section-chip-count {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.625rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        /* (violet active-count removed: teal system rule governs) */
+        
+        /* Instrument theme: icons sit unboxed on the row; monochrome chrome */
+        .section-chip { border-radius: 0.75rem; }
+        .section-chip-icon, .section-header-icon {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            width: auto !important;
+            height: auto !important;
+            padding: 0 !important;
+            border-radius: 0 !important;
+            flex-shrink: 0;
+        }
+        .section-chip-icon svg, .section-header-icon svg {
+            width: 18px !important;
+            height: 18px !important;
+            color: #9aa3bf !important;
+        }
+        /* First-line alignment for two-line chip labels */
+        #page-misconfig .section-chip, #page-codeanalysis .section-chip { align-items: flex-start !important; }
+        #page-misconfig .section-chip-icon, #page-codeanalysis .section-chip-icon { margin-top: 3px !important; }
+        .section-chip.active {
+            background: rgba(45, 212, 191, 0.08) !important;
+            border-color: rgba(45, 212, 191, 0.55) !important;
+            box-shadow: 0 0 0 1px rgba(45, 212, 191, 0.35), 0 4px 18px rgba(45, 212, 191, 0.12) !important;
+        }
+        .section-chip.active .section-chip-count {
+            background: rgba(45, 212, 191, 0.22) !important;
+            color: #a7f3d0 !important;
+        }
+        .section-chip:hover {
+            background: rgba(45, 212, 191, 0.06) !important;
+            border-color: rgba(45, 212, 191, 0.35) !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(45, 212, 191, 0.15) !important;
+        }
+        .dark-mode .section-header, .dark-mode .section-header:hover {
+            background: rgba(148, 163, 184, 0.06);
+            border-color: rgba(148, 163, 184, 0.14);
+        }
+        .filter-btn.active {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+            border-color: transparent;
+            color: white;
+            box-shadow: 0 4px 15px rgba(45, 212, 191, 0.25);
+        }
+        .upload-zone {
+            border: 2px dashed rgba(45, 212, 191, 0.35);
+        }
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: #2dd4bf;
+            background: rgba(45, 212, 191, 0.07);
+        }
+        .dark-mode .upload-zone { border: 2px dashed rgba(45, 212, 191, 0.35); }
+        .dark-mode .upload-zone:hover, .dark-mode .upload-zone.dragover {
+            border-color: #2dd4bf;
+            background: rgba(45, 212, 191, 0.07);
+        }
+        
+        /* Endpoints Page Specific Styles */
+        #page-endpoints .section-chip {
+            height: 56px;
+            min-height: 56px;
+        }
+        #page-endpoints .section-chip-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.625rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        #page-endpoints .section-chip-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        #page-endpoints .section-chip-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: white;
+            white-space: nowrap;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #page-endpoints .section-chip-count {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.625rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+        /* (violet active-count removed: teal system rule governs) */
+        /* (violet hovers removed: teal system rule governs) */
+        /* (violet hovers removed: teal system rule governs) */
+        /* (violet chip actives removed: teal system rule governs) */
+        /* (violet chip actives removed: teal system rule governs) */
+        
+        /* PAGE 1 ONLY: Chip-style horizontal section headers */
+        #page-misconfig .section-headers-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (max-width: 768px) {
+            #page-misconfig .section-headers-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            #page-misconfig .section-headers-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        #page-misconfig .section-chip {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 0.625rem;
+            padding: 0.875rem 1rem;
+            height: 56px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 1.25rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .dark-mode #page-misconfig .section-chip {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        /* (violet hovers removed: teal system rule governs) */
+        /* (violet hovers removed: teal system rule governs) */
+        /* (violet chip actives removed: teal system rule governs) */
+        /* (violet chip actives removed: teal system rule governs) */
+        #page-misconfig .section-chip-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 0.625rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        #page-misconfig .section-chip-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+        #page-misconfig .section-chip-title {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: white;
+            white-space: nowrap;
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        #page-misconfig .section-chip-count {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.625rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            flex-shrink: 0;
+        }
+        /* (violet active-count removed: teal system rule governs) */
+        #page-misconfig .section-contents-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        #page-misconfig .section-content-block {
+            display: none;
+            animation: fadeSlideIn 0.3s ease;
+        }
+        #page-misconfig .section-content-block.visible {
+            display: block;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        #page-misconfig .section-content-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(45, 212, 191, 0.18);
+        }
+        #page-misconfig .section-content-title h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+        /* (violet hovers removed: teal system rule governs) */
+        /* (violet chip actives removed: teal system rule governs) */
+        .section-chip-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .section-chip-icon svg {
+            width: 14px;
+            height: 14px;
+        }
+        .section-chip-title {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: white;
+            white-space: nowrap;
+        }
+        .section-chip-count {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            padding: 0.125rem 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        /* (violet active-count removed: teal system rule governs) */
+        .section-contents-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .section-content-block {
+            display: none;
+            animation: fadeSlideIn 0.3s ease;
+        }
+        .section-content-block.visible {
+            display: block;
+        }
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .section-content-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(45, 212, 191, 0.18);
+        }
+        .section-content-title h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: white;
+        }
+        .protection-normal { color: #22c55e; }
+        .protection-dangerous { color: #ef4444; }
+        .protection-signature { color: #3b82f6; }
+        .protection-privileged { color: #8b5cf6; }
+        .protection-internal { color: #f59e0b; }
+        .protection-unknown { color: #6b7280; }
+        .theme-toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .theme-toggle::after {
+            content: '☀️';
+            position: absolute;
+            left: 3px;
+            top: 2px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            transition: all 0.3s ease;
+        }
+        .dark-mode .theme-toggle {
+            background: rgba(255,255,255,0.05);
+        }
+        .dark-mode .theme-toggle::after {
+            content: '🌙';
+            left: 25px;
+            background: #27272a;
+        }
+        .text-adaptive {
+            color: var(--text-primary);
+        }
+        .text-adaptive-secondary {
+            color: var(--text-secondary);
+        }
+        .dark-mode .text-white {
+            color: #fafafa;
+        }
+        .dark-mode .text-gray-400 {
+            color: #a1a1aa;
+        }
+        .dark-mode .text-gray-500 {
+            color: #71717a;
+        }
+        .dark-mode .check-card {
+            background: rgba(0, 0, 0, 0.3) !important;
+        }
+        .instance-item {
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 2px solid #10b981;
+            padding: 0.5rem 0.75rem;
+            margin-top: 0.5rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+        .instance-source-tag {
+            display: inline-block;
+            min-width: 100px;
+            text-align: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .instance-source-java {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        .instance-source-smali {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+        .instance-source-extracted {
+            background: rgba(107, 114, 128, 0.2);
+            color: #9ca3af;
+        }
+        .instance-line-number {
+            display: inline-block;
+            min-width: 50px;
+            color: #06b6d4;
+            font-weight: 600;
+        }
+        .instance-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .instance-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: nowrap;
+        }
+        .instance-toggle {
+            cursor: pointer;
+            color: #06b6d4;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .instance-toggle:hover {
+            color: #22d3ee;
+        }
+        .instances-container {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        .instances-container.show {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .smali-note {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 0.75rem;
+        }
+        .smali-note code {
+            background: rgba(0,0,0,0.3);
+            padding: 0.125rem 0.375rem;
+            border-radius: 0.25rem;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen text-white dark-mode">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Navigation -->
+        <nav class="glass rounded-2xl p-4 mb-8 relative">
+            <div class="theme-toggle" onclick="toggleTheme()" title="Toggle Light/Dark Mode" style="position: absolute; top: 1rem; right: 1rem;"></div>
+            <div class="flex items-center justify-between flex-wrap gap-4" style="padding-right: 70px;">
+                <button onclick="goHome()" title="Home" class="flex items-center gap-3 cursor-pointer rounded-xl bg-transparent border-0 p-0 text-left">
+                    <span class="relative block">
+                        <svg class="w-5 h-5 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.25 12l8.954-8.955a1.126 1.126 0 011.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                        </svg>
+                    </span>
+                    <span class="text-xl font-medium font-display" style="color:#edeff7;letter-spacing:-0.01em">
+                        APK Security Analyzer
+                    </span>
+                    <svg class="h-[22px] w-auto text-[#3DDC84] shrink-0" viewBox="3.5 4.5 17 12.5" fill="currentColor" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M4 16.5a8 8 0 0 1 16 0H4zM9 12.2m-1.05 0a1.05 1.05 0 1 0 2.1 0 1.05 1.05 0 1 0-2.1 0M15 12.2m-1.05 0a1.05 1.05 0 1 0 2.1 0 1.05 1.05 0 1 0-2.1 0"/>
+                        <path d="M8.7 9.2 6.9 5.7M15.3 9.2l1.8-3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+                    </svg>
+                </button>
+                <div class="flex items-center gap-4 flex-wrap">
+                    <a href="#misconfig" onclick="navigateTo('misconfig')" class="nav-link active text-gray-300 hover:text-white font-medium flex items-center gap-2 text-sm" id="nav-misconfig">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                        Misconfig
+                    </a>
+                    <a href="#codeanalysis" onclick="navigateTo('codeanalysis')" class="nav-link text-gray-300 hover:text-white font-medium flex items-center gap-2 text-sm" id="nav-codeanalysis">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                        </svg>
+                        Code Analysis
+                    </a>
+                    <a href="#endpoints" onclick="navigateTo('endpoints')" class="nav-link text-gray-300 hover:text-white font-medium flex items-center gap-2 text-sm" id="nav-endpoints">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                        </svg>
+                        Endpoints
+                    </a>
+
+                    <a href="#dynamic" onclick="navigateTo('dynamic')" class="nav-link text-gray-300 hover:text-white font-medium flex items-center gap-2 text-sm" id="nav-dynamic">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+                        </svg>
+                        Dynamic
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Global Upload Section -->
+        <div id="globalUploadSection" class="mb-8">
+            <div class="flex flex-col gap-4">
+                <!-- APK Upload -->
+                <div id="globalUploadZone" class="upload-zone glass rounded-2xl p-8 text-center cursor-pointer w-full">
+                    <div class="flex flex-col items-center">
+                        <div class="relative mb-4">
+                            <svg class="w-16 h-16 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-light font-display mb-2">📦 APK File</h3>
+                        <div id="apkStatus" class="hidden mb-3">
+                            <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-medium flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span id="apkFileName">APK Loaded</span>
+                            </span>
+                        </div>
+                        <label for="globalFileInput" class="w-56 px-4 py-2 bg-white/10 hover:bg-white/15 border border-white/10 hover:border-teal-300/30 rounded-[10px] text-sm font-medium transition cursor-pointer text-center">
+                            Select APK File
+                        </label>
+                    </div>
+                    <input type="file" id="globalFileInput" accept=".apk,.apks,.xapk" class="hidden">
+                </div>
+
+                <!-- Scan history (reload-safe results; replaces prominent JADX upload) -->
+                <div id="scanHistorySection" class="glass rounded-2xl p-6 w-full text-left">
+                    <h3 class="text-lg font-semibold mb-1 text-teal-300">🕘 Previous scans</h3>
+                    <p class="text-gray-400 text-sm mb-3">Results are stored in this browser (IndexedDB) after each analysis — reload-safe, nothing is uploaded.</p>
+                    <div id="scanHistoryList" class="space-y-2">
+                        <p class="text-gray-500 text-sm">Loading history…</p>
+                    </div>
+                </div>
+
+                <div id="jadxAdvanced" class="hidden">
+                    <summary class="cursor-pointer text-cyan-300 font-medium text-sm">Advanced: add JADX output for best accuracy</summary>
+                    <div class="pt-4">
+                <!-- Decompiled Folder Upload -->
+                <div id="decompiledUploadZone" class="upload-zone glass rounded-2xl p-8 text-center cursor-pointer border-dashed border-2 border-cyan-500/30 w-full">
+                    <div class="flex flex-col items-center">
+                        <div class="relative mb-4">
+                            <svg class="w-16 h-16 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-lg font-semibold mb-2 text-cyan-400">📂 JADX Output <span class="text-gray-500 text-sm font-normal">(Optional)</span></h3>
+                        <p class="text-gray-400 text-sm mb-1">Best for readable Java/Kotlin source analysis</p>
+                        <p class="text-gray-500 text-xs mb-3">Run: <code class="bg-gray-800 px-2 py-0.5 rounded">jadx -d output/ app.apk</code></p>
+                        <div id="decompiledStatus" class="hidden mb-3">
+                            <span class="px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs font-medium flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                                <span id="decompiledFolderName">Folder Loaded</span>
+                            </span>
+                        </div>
+                        <label for="decompiledFolderInput" class="px-4 py-2 bg-white/10 hover:bg-white/15 border border-white/10 hover:border-teal-300/30 rounded-[10px] text-sm font-medium transition cursor-pointer">
+                            Select JADX Folder
+                        </label>
+                    </div>
+                    <input type="file" id="decompiledFolderInput" webkitdirectory directory multiple class="hidden">
+                </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Analysis Button -->
+            <div id="startAnalysisSection" class="hidden mt-6">
+                <div id="resumeSection" class="hidden mb-4 rounded-xl border border-amber-500/40 bg-amber-500/10 px-4 py-3">
+                    <p id="resumeText" class="text-amber-200 text-sm mb-2"></p>
+                    <div class="flex gap-2">
+                        <button data-resume-start class="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 rounded-lg text-xs font-medium transition">Resume scan</button>
+                        <button data-resume-dismiss class="px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-xs font-medium transition">Start over</button>
+                    </div>
+                </div>
+                <button id="startAnalysisBtn" onclick="startGlobalAnalysis()" class="w-full py-4 bg-[#2dd4bf] hover:bg-[#5eead4] text-[#052e2b] rounded-[10px] text-lg font-semibold font-display transition flex items-center justify-center gap-3" style="box-shadow: 0 6px 24px rgba(45,212,191,0.35)">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    Start Security Analysis
+                </button>
+                <p id="analysisHint" class="hidden text-center text-gray-500 text-sm mt-2">
+                    <span id="hintText">APK loaded. Click to analyze.</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Global Loading Section -->
+        <div id="globalLoadingSection" class="hidden mb-8">
+            <div class="glass rounded-2xl p-8">
+                <div class="flex flex-col items-center text-center gap-3 mb-6">
+                    <svg class="spokes-loader text-[#2dd4bf]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <path d="M12 2V6M16.2 7.8L19.1 4.9M18 12H22M16.2 16.2L19.1 19.1M12 18V22M4.9 19.1L7.8 16.2M2 12H6M4.9 4.9L7.8 7.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <div>
+                        <h3 class="text-xl font-semibold" id="globalLoadingTitle">Analyzing APK...</h3>
+                        <p class="hidden" id="globalLoadingStatus">Extracting contents...</p>
+                    </div>
+                </div>
+                <div data-scan-stages="apk" class="mt-6 mb-5 flex items-center gap-2 overflow-x-auto pb-1" aria-hidden="true">
+                    <div class="scan-stage" data-stage="0"><span class="scan-dot">1</span><span class="scan-stage-label">Extract</span></div>
+                    <div class="scan-link" data-link="0"></div>
+                    <div class="scan-stage" data-stage="1"><span class="scan-dot">2</span><span class="scan-stage-label">Disassemble</span></div>
+                    <div class="scan-link" data-link="1"></div>
+                    <div class="scan-stage" data-stage="2"><span class="scan-dot">3</span><span class="scan-stage-label">Analyze<span class="scan-sub" data-scan-catcount></span></span></div>
+                    <div class="scan-link" data-link="2"></div>
+                    <div class="scan-stage" data-stage="3"><span class="scan-dot">4</span><span class="scan-stage-label">Endpoints</span></div>
+                    <div class="scan-link" data-link="3"></div>
+                    <div class="scan-stage" data-stage="4"><span class="scan-dot">5</span><span class="scan-stage-label">Permissions</span></div>
+                </div>
+                <div class="mb-2 flex items-baseline gap-3">
+                    <span class="text-sm text-gray-400">Scan progress</span>
+                    <span data-scan-pct class="ml-auto text-sm font-semibold text-white shrink-0">0%</span>
+                </div>
+                <div class="relative h-[6px] bg-gray-800/80 border border-white/10 rounded-sm overflow-hidden">
+                    <div id="globalProgressBar" class="h-full progress-bar transition-all duration-300" style="width: 0%"></div>
+                </div>
+                <div class="mt-4 flex items-center justify-between gap-4">
+                    <div class="text-xs text-gray-500">elapsed <span data-scan-elapsed>0.0s</span> • <span data-scan-lines>0</span> events</div>
+                </div>
+                <div data-scan-console class="mt-2 h-[60vh] min-h-80 overflow-y-auto rounded-xl bg-black/40 border border-white/10 p-3 font-mono text-xs text-left" aria-live="polite">
+                    <div class="text-gray-500">Console ready — scan events appear here…</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Global File Info Bar -->
+        <div id="globalFileInfo" class="hidden glass rounded-2xl p-4 mb-6 fade-in">
+            <div class="flex items-center gap-4 flex-wrap">
+                <svg class="w-7 h-7 text-emerald-400" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.523 2H6.477C5.106 2 4 3.106 4 4.477v15.046C4 20.894 5.106 22 6.477 22h11.046C18.894 22 20 20.894 20 19.523V4.477C20 3.106 18.894 2 17.523 2zM12 18.5c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25zm0-4c-.69 0-1.25-.56-1.25-1.25V7.5c0-.69.56-1.25 1.25-1.25s1.25.56 1.25 1.25v5.75c0 .69-.56 1.25-1.25 1.25z"/>
+                    </svg>
+                <div class="flex-1">
+                    <h3 id="globalFileName" class="text-lg font-semibold"></h3>
+                    <p id="globalFileSize" class="text-gray-400 text-sm"></p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-medium flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Analyzed
+                    </span>
+                    <button onclick="resetGlobalAnalyzer()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Analyze Another APK
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Misconfig Checks Page (formerly Security) -->
+        <div id="page-misconfig" class="page active">
+            <div id="misconfigHeader" class="hidden text-center mb-8">
+                <h1 class="text-3xl font-light font-display mb-2" style="color:#edeff7">
+                    Misconfiguration Checks
+                </h1>
+                <p class="text-gray-400">Root, Emulator, SSL Pinning, Security Flags, Storage & Cryptography Analysis</p>
+            </div>
+
+            <div id="resultsSection" class="hidden">
+                
+                <div class="grid grid-cols-3 gap-3 mb-6 fade-in" style="animation-delay: 0.1s">
+                    <button onclick="setFilter('all')" id="filterAll" class="filter-btn active py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                        </svg>
+                        All Checks
+                        <span id="totalChecks" class="px-2 py-0.5 bg-white/20 rounded-full text-xs">0</span>
+                    </button>
+                    <button onclick="setFilter('detected')" id="filterDetected" class="filter-btn py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Detected
+                        <span id="detectedChecks" class="px-2 py-0.5 bg-white/20 rounded-full text-xs">0</span>
+                    </button>
+                    <button onclick="setFilter('not-detected')" id="filterNotDetected" class="filter-btn py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Not Detected
+                        <span id="notDetectedChecks" class="px-2 py-0.5 bg-white/20 rounded-full text-xs">0</span>
+                    </button>
+                </div>
+
+                <!-- Decompilation Note -->
+                <div id="smaliNote" class="hidden smali-note text-amber-300 mb-6 fade-in">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <strong class="text-amber-400">Note: APK contains compiled bytecode, not source code</strong>
+                            <p class="mt-1 text-amber-200/80">Found instances show extracted strings from DEX bytecode. For readable Java/Kotlin source code:</p>
+                            <ol class="mt-2 space-y-1 text-amber-200/70 list-decimal list-inside">
+                                <li>Decompile APK with JADX: <code>jadx -d output/ app.apk</code></li>
+                                <li>Upload the decompiled folder to <strong>Dynamic Analysis</strong> page for detailed source analysis</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Source Code Note (shown when JADX folder was provided) -->
+                <div id="sourceNote" class="hidden smali-note text-emerald-300 mb-6 fade-in" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
+                    <div class="flex items-start gap-3">
+                        <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <div>
+                            <strong class="text-emerald-400">✅ Analyzing decompiled Java/Kotlin source code</strong>
+                            <p class="mt-1 text-emerald-200/80">Found instances show actual source code with file paths and line numbers for easy reference.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+                    <div class="glass rounded-xl p-5 fade-in" style="animation-delay: 0.15s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Total Checks</p>
+                                <p id="totalChecksDisplay" class="text-3xl font-bold text-white">0</p>
+                            </div>
+                                                        <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                                </svg>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5 fade-in" style="animation-delay: 0.2s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Detected</p>
+                                <p id="detectedChecksDisplay" class="text-3xl font-bold text-amber-400">0</p>
+                            </div>
+                                                        <svg class="w-7 h-7 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5 fade-in" style="animation-delay: 0.25s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Not Detected</p>
+                                <p id="notDetectedChecksDisplay" class="text-3xl font-bold text-emerald-400">0</p>
+                            </div>
+                                                        <svg class="w-7 h-7 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                </svg>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5 fade-in" style="animation-delay: 0.3s">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Indicator Density</p>
+                                <p id="securityScore" class="text-3xl font-bold text-amber-400">0%</p>
+                            </div>
+                                                        <svg class="w-7 h-7 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Summary -->
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+                    <div class="glass rounded-xl p-4 fade-in border-l-4 border-orange-500">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            <div>
+                                <p class="text-gray-400 text-xs">Root Detection</p>
+                                <p class="text-lg font-semibold"><span id="rootDetectedCount">0</span> / <span id="rootTotalCount">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-4 fade-in border-l-4 border-cyan-500">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            <div>
+                                <p class="text-gray-400 text-xs">Emulator</p>
+                                <p class="text-lg font-semibold"><span id="emulatorDetectedCount">0</span> / <span id="emulatorTotalCount">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-4 fade-in border-l-4 border-pink-500">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                </svg>
+                            <div>
+                                <p class="text-gray-400 text-xs">SSL Pinning</p>
+                                <p class="text-lg font-semibold"><span id="sslDetectedCount">0</span> / <span id="sslTotalCount">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-4 fade-in border-l-4 border-yellow-500">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
+                                </svg>
+                            <div>
+                                <p class="text-gray-400 text-xs">Security Flags</p>
+                                <p class="text-lg font-semibold"><span id="flagDetectedCount">0</span> / <span id="flagTotalCount">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-4 fade-in border-l-4 border-teal-500">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                                </svg>
+                            <div>
+                                <p class="text-gray-400 text-xs">Local Storage</p>
+                                <p class="text-lg font-semibold"><span id="storageDetectedCount">0</span> / <span id="storageTotalCount">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-4 fade-in border-l-4 border-red-500">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            <div>
+                                <p class="text-gray-400 text-xs">Cryptography</p>
+                                <p class="text-lg font-semibold"><span id="cryptoDetectedCount">0</span> / <span id="cryptoTotalCount">0</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Headers Row with Toggle Button -->
+                <div class="flex items-center justify-end mb-4">
+                    <button id="toggleAllSectionsBtn" onclick="toggleAllSections()" class="px-4 py-2.5 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 rounded-xl text-sm font-medium transition flex items-center gap-2 whitespace-nowrap">
+                        <svg id="toggleAllIcon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                        <span id="toggleAllText">Collapse All</span>
+                    </button>
+                </div>
+                
+                <div class="section-headers-container mb-6">
+                    <div class="section-chip" id="rootChip" onclick="toggleSectionChip('root')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Root Detection</span>
+                        <span class="section-chip-count" id="rootChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="emulatorChip" onclick="toggleSectionChip('emulator')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Emulator</span>
+                        <span class="section-chip-count" id="emulatorChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="sslChip" onclick="toggleSectionChip('ssl')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">SSL Pinning</span>
+                        <span class="section-chip-count" id="sslChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="flagChip" onclick="toggleSectionChip('flag')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Security Flags</span>
+                        <span class="section-chip-count" id="flagChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="storageChip" onclick="toggleSectionChip('storage')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Local Storage</span>
+                        <span class="section-chip-count" id="storageChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="cryptoChip" onclick="toggleSectionChip('crypto')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Cryptography</span>
+                        <span class="section-chip-count" id="cryptoChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="permissionChip" onclick="toggleSectionChip('permission')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Permissions</span>
+                        <span class="section-chip-count" id="permissionChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="loggingChip" onclick="toggleSectionChip('logging')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Insecure Logging</span>
+                        <span class="section-chip-count" id="loggingChipCount">0</span>
+                    </div>
+                </div>
+
+                <!-- Section Contents Container -->
+                <div class="section-contents-container">
+                    <!-- Root Detection Content -->
+                    <div id="rootSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                            <h3>Root Detection Checks</h3>
+                        </div>
+                        <div id="rootResults" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+
+                    <!-- Emulator Detection Content -->
+                    <div id="emulatorSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <h3>Emulator Detection Checks</h3>
+                        </div>
+                        <div id="emulatorResults" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+
+                    <!-- SSL Pinning Content -->
+                    <div id="sslSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/>
+                                </svg>
+                            </div>
+                            <h3>SSL Pinning Detection Checks</h3>
+                        </div>
+                        <div id="sslResults" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+
+                    <!-- Security Flags Content -->
+                    <div id="flagSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
+                                </svg>
+                            </div>
+                            <h3>Security Flag Checks</h3>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 mb-4">
+                            <button onclick="setFlagCategoryFilter('all')" id="flagCatAll" class="filter-btn active py-2 rounded-lg font-medium text-xs text-center">All Categories</button>
+                            <button onclick="setFlagCategoryFilter('Screen Protection')" id="flagCatScreen" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Screen Protection</button>
+                            <button onclick="setFlagCategoryFilter('UI Security')" id="flagCatUI" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">UI Security</button>
+                            <button onclick="setFlagCategoryFilter('Component Security')" id="flagCatComponent" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Component Security</button>
+                            <button onclick="setFlagCategoryFilter('Intent Security')" id="flagCatIntent" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Intent Security</button>
+                            <button onclick="setFlagCategoryFilter('Activity Security')" id="flagCatActivity" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Activity Security</button>
+                            <button onclick="setFlagCategoryFilter('WebView Security')" id="flagCatWebView" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">WebView Security</button>
+                            <button onclick="setFlagCategoryFilter('Build Security')" id="flagCatBuild" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Build Security</button>
+                            <button onclick="setFlagCategoryFilter('Data Security')" id="flagCatData" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Data Security</button>
+                            <button onclick="setFlagCategoryFilter('Permission Security')" id="flagCatPermission" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Permission Security</button>
+                            <button onclick="setFlagCategoryFilter('Network Security')" id="flagCatNetwork" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Network Security</button>
+                            <button onclick="setFlagCategoryFilter('Runtime Security')" id="flagCatRuntime" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Runtime Security</button>
+                        </div>
+                        <div id="flagResults" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+
+                    <!-- Local Storage Content -->
+                    <div id="storageSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                                </svg>
+                            </div>
+                            <h3>Local Storage Security Checks (SAST)</h3>
+                        </div>
+                        <div class="grid grid-cols-5 gap-2 mb-4">
+                            <button onclick="setStorageCategoryFilter('all')" id="storageCatAll" class="filter-btn active py-2 rounded-lg font-medium text-xs text-center">All</button>
+                            <button onclick="setStorageCategoryFilter('SharedPreferences')" id="storageCatPrefs" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">SharedPrefs</button>
+                            <button onclick="setStorageCategoryFilter('SQLite')" id="storageCatSqlite" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">SQLite</button>
+                            <button onclick="setStorageCategoryFilter('File Storage')" id="storageCatFiles" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Files</button>
+                            <button onclick="setStorageCategoryFilter('Hardcoded Secrets')" id="storageCatSecrets" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Secrets</button>
+                        </div>
+                        <div id="storageResults" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+
+                    <!-- Cryptography Content -->
+                    <div id="cryptoSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                            </div>
+                            <h3>Cryptography Security Checks</h3>
+                        </div>
+                        <div class="grid grid-cols-4 gap-2 mb-4">
+                            <button onclick="setCryptoCategoryFilter('all')" id="cryptoCatAll" class="filter-btn active py-2 rounded-lg font-medium text-xs text-center">All</button>
+                            <button onclick="setCryptoCategoryFilter('Weak Algorithms')" id="cryptoCatWeak" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Weak Algo</button>
+                            <button onclick="setCryptoCategoryFilter('Key Management')" id="cryptoCatKey" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Key Mgmt</button>
+                            <button onclick="setCryptoCategoryFilter('IV/Nonce Issues')" id="cryptoCatIV" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">IV/Nonce</button>
+                            <button onclick="setCryptoCategoryFilter('Random Generation')" id="cryptoCatRandom" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Random</button>
+                            <button onclick="setCryptoCategoryFilter('Certificate Validation')" id="cryptoCatCert" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Cert Validation</button>
+                            <button onclick="setCryptoCategoryFilter('Custom Crypto')" id="cryptoCatCustom" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Custom Crypto</button>
+                            <button onclick="setCryptoCategoryFilter('Keystore Issues')" id="cryptoCatKeystore" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Keystore</button>
+                        </div>
+                        <div id="cryptoResults" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+
+                    <!-- Component Permission Analysis Content -->
+                    <div id="permissionSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                            </div>
+                            <h3>Exported Components & Permissions</h3>
+                        </div>
+                        <!-- Component Summary -->
+                        <div id="componentSummary" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+                            <div class="glass rounded-lg p-3 text-center border-l-2 border-blue-500">
+                                <p class="text-xl font-bold text-blue-400" id="activityCount">0</p>
+                                <p class="text-gray-400 text-xs">Activities</p>
+                            </div>
+                            <div class="glass rounded-lg p-3 text-center border-l-2 border-green-500">
+                                <p class="text-xl font-bold text-green-400" id="serviceCount">0</p>
+                                <p class="text-gray-400 text-xs">Services</p>
+                            </div>
+                            <div class="glass rounded-lg p-3 text-center border-l-2 border-yellow-500">
+                                <p class="text-xl font-bold text-yellow-400" id="receiverCount">0</p>
+                                <p class="text-gray-400 text-xs">Receivers</p>
+                            </div>
+                            <div class="glass rounded-lg p-3 text-center border-l-2 border-purple-500">
+                                <p class="text-xl font-bold text-purple-400" id="providerCount">0</p>
+                                <p class="text-gray-400 text-xs">Providers</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Risk Summary -->
+                        <div class="flex items-center gap-2 mb-4 flex-wrap">
+                            <span class="px-3 py-1 bg-red-500/20 text-red-400 rounded-full text-xs font-medium" id="highRiskCount">0 High Risk</span>
+                            <span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-xs font-medium" id="mediumRiskCount">0 Medium Risk</span>
+                            <span class="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-medium" id="lowRiskCount">0 Low Risk</span>
+                        </div>
+                        
+                        <!-- Component Type Filter -->
+                        <div class="grid grid-cols-5 gap-2 mb-4">
+                            <button onclick="setComponentFilter('all')" id="compFilterAll" class="filter-btn active py-2 rounded-lg font-medium text-xs text-center">All</button>
+                            <button onclick="setComponentFilter('activity')" id="compFilterActivity" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Activities</button>
+                            <button onclick="setComponentFilter('service')" id="compFilterService" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Services</button>
+                            <button onclick="setComponentFilter('receiver')" id="compFilterReceiver" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Receivers</button>
+                            <button onclick="setComponentFilter('provider')" id="compFilterProvider" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Providers</button>
+                        </div>
+                        
+                        <!-- Components List -->
+                        <div id="componentsResults" class="space-y-2"></div>
+                        
+                        <!-- No Components Message -->
+                        <div id="noComponentsMessage" class="hidden glass rounded-xl p-6 text-center text-gray-400">
+                            <svg class="w-12 h-12 mx-auto mb-3 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            <p>No exported components found.</p>
+                            <p class="text-sm mt-1">Upload a JADX decompiled folder containing AndroidManifest.xml</p>
+                        </div>
+                    </div>
+
+                    <!-- Insecure Logging Content -->
+                    <div id="loggingSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                            </div>
+                            <h3>Insecure Logging Analysis</h3>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mb-4">
+                            <button onclick="setLoggingCategoryFilter('all')" id="loggingCatAll" class="filter-btn active py-2 rounded-lg font-medium text-xs text-center">All</button>
+                            <button onclick="setLoggingCategoryFilter('Credentials & Secrets')" id="loggingCatSecrets" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">Credentials & Secrets</button>
+                            <button onclick="setLoggingCategoryFilter('PII')" id="loggingCatPII" class="filter-btn py-2 rounded-lg font-medium text-xs text-center">PII Exposure</button>
+                        </div>
+                        <div id="loggingResults" class="grid grid-cols-1 md:grid-cols-2 gap-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Analysis Page -->
+        <div id="page-codeanalysis" class="page">
+            <div id="codeAnalysisHeader" class="hidden text-center mb-8">
+                <h1 class="text-3xl font-light font-display mb-2" style="color:#edeff7">
+                    Code Analysis
+                </h1>
+                <p class="text-gray-400">Authentication, Authorization & Backend Security Risk Indicators</p>
+            </div>
+
+            <div id="codeAnalysisResults" class="hidden">
+                <!-- Expand/Collapse All Toggle -->
+                <div class="flex items-center justify-end mb-4">
+                    <button id="toggleAllCodeSectionsBtn" onclick="toggleAllCodeSections()" class="px-4 py-2 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <svg id="toggleAllCodeIcon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                        <span id="toggleAllCodeText">Collapse All</span>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-3 mb-6 fade-in">
+                    <button onclick="setCodeFilter('all')" id="codeFilterAll" class="filter-btn active py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/>
+                        </svg>
+                        All Checks
+                        <span id="codeTotalChecks" class="px-2 py-0.5 bg-white/20 rounded-full text-xs">0</span>
+                    </button>
+                    <button onclick="setCodeFilter('detected')" id="codeFilterDetected" class="filter-btn py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Detected
+                        <span id="codeDetectedChecks" class="px-2 py-0.5 bg-white/20 rounded-full text-xs">0</span>
+                    </button>
+                    <button onclick="setCodeFilter('not-detected')" id="codeFilterNotDetected" class="filter-btn py-2.5 rounded-xl font-medium text-sm transition-all duration-300 flex items-center justify-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        Not Detected
+                        <span id="codeNotDetectedChecks" class="px-2 py-0.5 bg-white/20 rounded-full text-xs">0</span>
+                    </button>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div class="glass rounded-xl p-5 border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Authentication Checks</p>
+                                <p id="authDetectedCount" class="text-2xl font-bold text-blue-400">0 / 0</p>
+                            </div>
+                                                        <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                                </svg>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5 border-l-4 border-indigo-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Authorization Checks</p>
+                                <p id="authzDetectedCount" class="text-2xl font-bold text-indigo-400">0 / 0</p>
+                            </div>
+                                                        <svg class="w-7 h-7 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Headers Row -->
+                <div class="section-headers-container mb-6">
+                    <div class="section-chip" id="authCodeChip" onclick="toggleCodeSectionChip('auth')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Authentication</span>
+                        <span class="section-chip-count" id="authCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="authzCodeChip" onclick="toggleCodeSectionChip('authz')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Authorization</span>
+                        <span class="section-chip-count" id="authzCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="featureFlagsCodeChip" onclick="toggleCodeSectionChip('featureFlags')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Feature Flags</span>
+                        <span class="section-chip-count" id="featureFlagsCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="hiddenEndpointsCodeChip" onclick="toggleCodeSectionChip('hiddenEndpoints')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Hidden Endpoints</span>
+                        <span class="section-chip-count" id="hiddenEndpointsCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="authTrustCodeChip" onclick="toggleCodeSectionChip('authTrust')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Auth Trust</span>
+                        <span class="section-chip-count" id="authTrustCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="rateLimitingCodeChip" onclick="toggleCodeSectionChip('rateLimiting')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Rate Limiting</span>
+                        <span class="section-chip-count" id="rateLimitingCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="businessLogicCodeChip" onclick="toggleCodeSectionChip('businessLogic')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Business Logic</span>
+                        <span class="section-chip-count" id="businessLogicCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="fileHandlingCodeChip" onclick="toggleCodeSectionChip('fileHandling')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">File Handling</span>
+                        <span class="section-chip-count" id="fileHandlingCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="errorHandlingCodeChip" onclick="toggleCodeSectionChip('errorHandling')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Error Handling</span>
+                        <span class="section-chip-count" id="errorHandlingCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="envLeakageCodeChip" onclick="toggleCodeSectionChip('envLeakage')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Env Leakage</span>
+                        <span class="section-chip-count" id="envLeakageCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="cryptoTrustCodeChip" onclick="toggleCodeSectionChip('cryptoTrust')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Crypto Trust</span>
+                        <span class="section-chip-count" id="cryptoTrustCodeChipCount">0</span>
+                    </div>
+                    <div class="section-chip" id="manifestPostureCodeChip" onclick="toggleCodeSectionChip('manifestPosture')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Manifest Posture</span>
+                        <span class="section-chip-count" id="manifestPostureCodeChipCount">0</span>
+                    </div>
+                </div>
+
+                <!-- Authentication Section -->
+                <div id="authSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('auth')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🔐 Authentication Security Analysis</h2>
+                        <div class="section-header-chevron expanded" id="authChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="authContent" class="collapsible-content expanded">
+                        <div id="authResults" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4"></div>
+                    </div>
+                </div>
+
+                <!-- Authorization Section -->
+                <div id="authzSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('authz')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🔑 Authorization Security Analysis</h2>
+                        <div class="section-header-chevron expanded" id="authzChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="authzContent" class="collapsible-content expanded">
+                        <div id="authzResults" class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4"></div>
+                    </div>
+                </div>
+
+                <!-- 1. Feature Flags & Hidden Functionality -->
+                <div id="featureFlagsSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('featureFlags')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🚩 Feature Flags & Hidden Functionality</h2>
+                        <div class="section-header-chevron expanded" id="featureFlagsChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="featureFlagsContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-purple-900/10 border border-purple-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Client-side feature gating may indicate backend functionality exists even when hidden or disabled in the UI. Backend APIs should independently verify feature access.</p>
+                        </div>
+                        <div id="featureFlagsResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 2. Hidden/Unused API Endpoints -->
+                <div id="hiddenEndpointsSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('hiddenEndpoints')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🔗 Hidden / Unused API Endpoints</h2>
+                        <div class="section-header-chevron expanded" id="hiddenEndpointsChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="hiddenEndpointsContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-red-900/10 border border-red-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Backend APIs may remain accessible despite not being exposed in the application UI. Deprecated or admin endpoints should be properly secured or removed.</p>
+                        </div>
+                        <div id="hiddenEndpointsResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 3. Auth Trust Signals -->
+                <div id="authTrustSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('authTrust')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🔐 Authentication & Authorization Trust Signals</h2>
+                        <div class="section-header-chevron expanded" id="authTrustChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="authTrustContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-yellow-900/10 border border-yellow-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Backend authorization decisions may rely on client-supplied data. Identity fields should be derived from authenticated session tokens, not request parameters.</p>
+                        </div>
+                        <div id="authTrustResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 4. Mass Assignment Indicators -->
+                <div id="massAssignmentSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('massAssignment')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">📝 Request Models & Mass Assignment Indicators</h2>
+                        <div class="section-header-chevron expanded" id="massAssignmentChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="massAssignmentContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-pink-900/10 border border-pink-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Backend may accept unintended or privileged parameters. Request objects should use allowlists for accepted fields.</p>
+                        </div>
+                        <div id="massAssignmentResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 5. Input Validation Signals -->
+                <div id="inputValidationSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('inputValidation')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">✅ Input Validation & Injection Signals</h2>
+                        <div class="section-header-chevron expanded" id="inputValidationChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="inputValidationContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-orange-900/10 border border-orange-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Backend may rely on client validation, increasing injection risk. Server-side validation should never be bypassed regardless of client checks.</p>
+                        </div>
+                        <div id="inputValidationResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 6. Business Logic Enforcement -->
+                <div id="businessLogicSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('businessLogic')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">💰 Business Logic Enforcement</h2>
+                        <div class="section-header-chevron expanded" id="businessLogicChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="businessLogicContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-green-900/10 border border-green-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Business rules enforced client-side may be bypassable via direct API interaction. Critical business logic must be enforced server-side.</p>
+                        </div>
+                        <div id="businessLogicResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 7. File Handling & Object Access -->
+                <div id="fileHandlingSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('fileHandling')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">📂 File Handling & Object Access</h2>
+                        <div class="section-header-chevron expanded" id="fileHandlingChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="fileHandlingContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-cyan-900/10 border border-cyan-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Indicates potential for IDOR or improper file handling on backend. Object identifiers and file paths should be validated and access-controlled.</p>
+                        </div>
+                        <div id="fileHandlingResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 8. Error Handling & Debug Exposure -->
+                <div id="errorHandlingSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('errorHandling')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">⚠️ Error Handling & Debug Exposure</h2>
+                        <div class="section-header-chevron expanded" id="errorHandlingChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="errorHandlingContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-amber-900/10 border border-amber-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Backend error handling may leak internal implementation details. Production APIs should return sanitized error messages.</p>
+                        </div>
+                        <div id="errorHandlingResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 9. Environment & Infrastructure Leakage -->
+                <div id="envLeakageSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('envLeakage')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🌐 Environment & Infrastructure Leakage</h2>
+                        <div class="section-header-chevron expanded" id="envLeakageChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="envLeakageContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-teal-900/10 border border-teal-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> Non-production environments may be externally reachable and weakly secured. Staging/dev environments should not be exposed in production builds.</p>
+                        </div>
+                        <div id="envLeakageResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 10. Cryptographic Trust Signals -->
+                <div id="cryptoTrustSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('cryptoTrust')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🔒 Cryptographic Trust Signals</h2>
+                        <div class="section-header-chevron expanded" id="cryptoTrustChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="cryptoTrustContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-violet-900/10 border border-violet-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> If the client can generate or validate secrets, attackers may replicate the process. Cryptographic operations for server verification should occur server-side only.</p>
+                        </div>
+                        <div id="cryptoTrustResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- SQL Injection Vulnerabilities -->
+                <div id="sqlInjectionSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('sqlInjection')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">💉 SQL Injection Vulnerabilities</h2>
+                        <div class="section-header-chevron expanded" id="sqlInjectionChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="sqlInjectionContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-red-900/10 border border-red-500/20">
+                            <p class="text-sm text-gray-300"><strong>CRITICAL:</strong> SQL injection enables authentication bypass, data exfiltration, and privilege escalation. All dynamic SQL must use parameterized queries.</p>
+                        </div>
+                        <div id="sqlInjectionResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- NoSQL Injection Vulnerabilities -->
+                <div id="nosqlInjectionSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('nosqlInjection')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">📊 NoSQL Injection Vulnerabilities</h2>
+                        <div class="section-header-chevron expanded" id="nosqlInjectionChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="nosqlInjectionContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-orange-900/10 border border-orange-500/20">
+                            <p class="text-sm text-gray-300"><strong>HIGH RISK:</strong> NoSQL injection via operators like $ne, $gt can bypass authentication and authorization. Validate all query structures server-side.</p>
+                        </div>
+                        <div id="nosqlInjectionResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- SSRF Vulnerabilities -->
+                <div id="ssrfSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('ssrf')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">🌐 Server-Side Request Forgery (SSRF)</h2>
+                        <div class="section-header-chevron expanded" id="ssrfChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="ssrfContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-yellow-900/10 border border-yellow-500/20">
+                            <p class="text-sm text-gray-300"><strong>HIGH RISK:</strong> Dynamic URL construction enables SSRF to internal networks, cloud metadata services, and internal APIs. Implement strict URL whitelisting.</p>
+                        </div>
+                        <div id="ssrfResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- XXE Vulnerabilities -->
+                <div id="xxeSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('xxe')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">📄 XML External Entity (XXE) Injection</h2>
+                        <div class="section-header-chevron expanded" id="xxeChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="xxeContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-pink-900/10 border border-pink-500/20">
+                            <p class="text-sm text-gray-300"><strong>CRITICAL:</strong> XXE vulnerabilities enable local file disclosure, SSRF, and DoS attacks. All XML parsers must disable external entity resolution.</p>
+                        </div>
+                        <div id="xxeResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Insecure Deserialization -->
+                <div id="deserializationSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('deserialization')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">⚡ Insecure Deserialization</h2>
+                        <div class="section-header-chevron expanded" id="deserializationChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="deserializationContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-purple-900/10 border border-purple-500/20">
+                            <p class="text-sm text-gray-300"><strong>CRITICAL:</strong> Insecure deserialization leads to Remote Code Execution via gadget chains. Never deserialize untrusted data; use safe formats like JSON.</p>
+                        </div>
+                        <div id="deserializationResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Command Injection -->
+                <div id="commandInjectionSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('commandInjection')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">💻 Command Injection Vulnerabilities</h2>
+                        <div class="section-header-chevron expanded" id="commandInjectionChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="commandInjectionContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-red-900/10 border border-red-500/20">
+                            <p class="text-sm text-gray-300"><strong>CRITICAL:</strong> Command injection enables arbitrary OS command execution and system compromise. Avoid Runtime.exec() and validate all inputs.</p>
+                        </div>
+                        <div id="commandInjectionResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+                <!-- 19. Manifest Posture -->
+                <div id="manifestPostureSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleCodeSection('manifestPosture')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">📋 Manifest Posture</h2>
+                        <div class="section-header-chevron expanded" id="manifestPostureChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="manifestPostureContent" class="collapsible-content expanded">
+                        <div class="glass rounded-lg p-4 mb-3 bg-slate-900/10 border border-slate-500/20">
+                            <p class="text-sm text-gray-300"><strong>Security Insight:</strong> The manifest declares the app's attack surface: SDK posture, high-risk permissions, and component exposure. Findings here apply whether or not JADX output was provided.</p>
+                        </div>
+                        <div id="manifestPostureResults" class="space-y-2 pt-2"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Endpoints Page -->
+        <div id="page-endpoints" class="page">
+            <div id="endpointsHeader" class="hidden text-center mb-8">
+                <h1 class="text-3xl font-light font-display mb-2" style="color:#edeff7">
+                    Endpoints Analyzer
+                </h1>
+                <p class="text-gray-400">Extracted URLs, APIs, WebSockets, Deep Links & Cloud Services</p>
+            </div>
+
+            <div id="endpointResultsSection" class="hidden">
+                <div class="flex justify-end items-center gap-2 mb-4">
+                    <button onclick="exportEndpoints()" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Export Endpoints
+                    </button>
+                    <button onclick="exportReportJSON()" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        Export JSON
+                    </button>
+                    <button onclick="exportReportHTML()" class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        Export HTML
+                    </button>
+                    <button onclick="toggleEndpointSectionsExpandCollapse()" id="endpointToggleBtn" class="px-4 py-2 bg-teal-500/10 hover:bg-teal-500/20 border border-teal-500/30 rounded-lg text-sm font-medium transition">
+                        Collapse All
+                    </button>
+                </div>
+                
+                <div class="glass rounded-xl px-5 py-3 mb-6 fade-in flex items-center justify-between gap-3">
+                    <span class="text-sm text-gray-400">Every entry below was detected in the app binary.</span>
+                    <span id="endpointSummary" class="text-sm font-semibold text-cyan-300 whitespace-nowrap"></span>
+                </div>
+
+                <div class="glass rounded-xl p-4 mb-6 fade-in">
+                    <div class="flex items-center gap-3">
+                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                        </svg>
+                        <input type="text" id="endpointSearch" placeholder="Search endpoints..." class="flex-1 bg-transparent border-none outline-none text-white placeholder-gray-500" oninput="filterEndpointsBySearch()">
+                        <span id="searchResultCount" class="text-gray-500 text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+                    <div class="section-chip" id="httpEndpointChip" onclick="toggleEndpointSectionChip('http')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">HTTP/S</span>
+                        <span class="section-chip-count" id="httpEndpointCount">0</span>
+                    </div>
+                    <div class="section-chip" id="apiEndpointChip" onclick="toggleEndpointSectionChip('api')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">API</span>
+                        <span class="section-chip-count" id="apiEndpointCount">0</span>
+                    </div>
+                    <div class="section-chip" id="wsEndpointChip" onclick="toggleEndpointSectionChip('ws')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">WebSocket</span>
+                        <span class="section-chip-count" id="wsEndpointCount">0</span>
+                    </div>
+                    <div class="section-chip" id="deeplinkEndpointChip" onclick="toggleEndpointSectionChip('deeplink')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Deep Links</span>
+                        <span class="section-chip-count" id="deeplinkEndpointCount">0</span>
+                    </div>
+                    <div class="section-chip" id="cloudEndpointChip" onclick="toggleEndpointSectionChip('cloud')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Cloud</span>
+                        <span class="section-chip-count" id="cloudEndpointCount">0</span>
+                    </div>
+                    <div class="section-chip" id="ipEndpointChip" onclick="toggleEndpointSectionChip('ip')">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">IP</span>
+                        <span class="section-chip-count" id="ipEndpointCount">0</span>
+                    </div>
+                    <div class="section-chip" id="uniqueDomainChip" onclick="toggleUniqueDomains()">
+                        <div class="section-chip-icon">
+                            <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                            </svg>
+                        </div>
+                        <span class="section-chip-title">Unique domains</span>
+                        <span class="section-chip-count" id="uniqueDomainCount"></span>
+                    </div>
+                </div>
+
+                <div class="section-contents-container">
+                    <div id="httpEndpointSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+                                </svg>
+                            </div>
+                            <h3>HTTP/S Endpoints</h3>
+                        </div>
+                        <div id="httpEndpointResults" class="space-y-2"></div>
+                    </div>
+
+                    <div id="apiEndpointSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+                                </svg>
+                            </div>
+                            <h3>API Endpoints</h3>
+                        </div>
+                        <div id="apiEndpointResults" class="space-y-2"></div>
+                    </div>
+
+                    <div id="wsEndpointSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                                </svg>
+                            </div>
+                            <h3>WebSocket Endpoints</h3>
+                        </div>
+                        <div id="wsEndpointResults" class="space-y-2"></div>
+                    </div>
+
+                    <div id="deeplinkEndpointSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                                </svg>
+                            </div>
+                            <h3>Deep Link Endpoints</h3>
+                        </div>
+                        <div id="deeplinkEndpointResults" class="space-y-2"></div>
+                    </div>
+
+                    <div id="cloudEndpointSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+                                </svg>
+                            </div>
+                            <h3>Cloud Service Endpoints</h3>
+                        </div>
+                        <div id="cloudEndpointResults" class="space-y-2"></div>
+                    </div>
+
+                    <div id="ipEndpointSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/>
+                                </svg>
+                            </div>
+                            <h3>IP Address Endpoints</h3>
+                        </div>
+                        <div id="ipEndpointResults" class="space-y-2"></div>
+                    </div>
+
+                    <div id="uniqueEndpointSection" class="section-content-block">
+                        <div class="section-content-title">
+                            <div class="section-chip-icon">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                                </svg>
+                            </div>
+                            <h3>Unique Domain Endpoints</h3>
+                        </div>
+                        <div id="uniqueEndpointResults" class="space-y-2"></div>
+                    </div>
+                </div>
+
+                <div id="noEndpointsFound" class="hidden glass rounded-2xl p-12 text-center">
+                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    <h3 class="text-xl font-semibold text-gray-400 mb-2">No Endpoints Found</h3>
+                    <p class="text-gray-500">No externally reachable endpoints were detected in this APK.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Analysis Page -->
+        <div id="page-dynamic" class="page">
+            <div id="dynamicHeader" class="hidden text-center mb-8">
+                <h1 class="text-3xl font-light font-display mb-2" style="color:#edeff7">
+                    App Data Analysis (Static)
+                </h1>
+                <p class="text-gray-400">Analyze app data folder for security vulnerabilities (SharedPreferences, SQLite, Files)</p>
+            </div>
+
+            <!-- Dynamic Upload Section -->
+            <div id="dynamicUploadSection" class="mb-8">
+                <div id="dynamicUploadZone" class="upload-zone glass rounded-2xl p-12 text-center cursor-pointer">
+                    <div class="flex flex-col items-center">
+                        <div class="relative mb-6">
+                            <svg class="w-20 h-20 text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                            </svg>
+                        </div>
+                        <h3 class="text-xl font-semibold mb-2">Upload App Data Folder</h3>
+                        <p class="text-gray-400 mb-2">Select the extracted app data folder from /data/data/&lt;package&gt;/</p>
+                        <p class="text-gray-500 text-sm mb-2">Supports: databases/, shared_prefs/, files/, cache/</p>
+                        <p class="text-gray-500 text-sm mb-4">💡 <strong>Tip:</strong> For source code analysis, upload JADX decompiled output folder</p>
+                        <span class="px-4 py-2 bg-white/10 hover:bg-white/20 border border-white/10 rounded-lg text-sm font-medium transition">
+                            Select Folder
+                        </span>
+                    </div>
+                    <input type="file" id="dynamicFolderInput" webkitdirectory directory multiple class="hidden">
+                </div>
+            </div>
+
+            <!-- Dynamic Loading Section -->
+            <div id="dynamicLoadingSection" class="hidden mb-8">
+                <div class="glass rounded-2xl p-8">
+                    <div class="flex flex-col items-center text-center gap-3 mb-6">
+                        <svg class="spokes-loader text-[#2dd4bf]" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                            <path d="M12 2V6M16.2 7.8L19.1 4.9M18 12H22M16.2 16.2L19.1 19.1M12 18V22M4.9 19.1L7.8 16.2M2 12H6M4.9 4.9L7.8 7.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <div>
+                            <h3 class="text-xl font-semibold" id="dynamicLoadingTitle">Analyzing App Data...</h3>
+                            <p class="hidden" id="dynamicLoadingStatus">Scanning files...</p>
+                        </div>
+                    </div>
+                    <div data-scan-stages="dynamic" class="mt-6 mb-5 flex items-center gap-2 overflow-x-auto pb-1" aria-hidden="true">
+                        <div class="scan-stage" data-stage="0"><span class="scan-dot">1</span><span class="scan-stage-label">Files</span></div>
+                        <div class="scan-link" data-link="0"></div>
+                        <div class="scan-stage" data-stage="1"><span class="scan-dot">2</span><span class="scan-stage-label">Preferences</span></div>
+                        <div class="scan-link" data-link="1"></div>
+                        <div class="scan-stage" data-stage="2"><span class="scan-dot">3</span><span class="scan-stage-label">SQLite</span></div>
+                        <div class="scan-link" data-link="2"></div>
+                        <div class="scan-stage" data-stage="3"><span class="scan-dot">4</span><span class="scan-stage-label">Cache</span></div>
+                    </div>
+                    <div class="mb-2 flex items-baseline gap-3">
+                        <span class="text-sm text-gray-400">Scan progress</span>
+                        <span data-scan-pct class="ml-auto text-sm font-semibold text-white shrink-0">0%</span>
+                    </div>
+                    <div class="relative h-[6px] bg-gray-800/80 border border-white/10 rounded-sm overflow-hidden">
+                        <div id="dynamicProgressBar" class="h-full progress-bar transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between gap-4">
+                        <div class="text-xs text-gray-500">elapsed <span data-scan-elapsed>0.0s</span> • <span data-scan-lines>0</span> events</div>
+                    </div>
+                    <div data-scan-console class="mt-2 h-[60vh] min-h-80 overflow-y-auto rounded-xl bg-black/40 border border-white/10 p-3 font-mono text-xs text-left" aria-live="polite">
+                        <div class="text-gray-500">Console ready — scan events appear here…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dynamic File Info -->
+            <div id="dynamicFileInfo" class="hidden glass rounded-2xl p-4 mb-6 fade-in">
+                <div class="flex items-center gap-4 flex-wrap">
+                    <svg class="w-7 h-7 text-slate-400" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+                        </svg>
+                    <div class="flex-1">
+                        <h3 id="dynamicFolderName" class="text-lg font-semibold"></h3>
+                        <p id="dynamicFileCount" class="text-gray-400 text-sm"></p>
+                    </div>
+                    <button onclick="resetDynamicAnalysis()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                        </svg>
+                        Analyze Another Folder
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Results Section -->
+            <div id="dynamicResultsSection" class="hidden">
+                <!-- Expand/Collapse All Toggle -->
+                <div class="flex items-center justify-end mb-4">
+                    <button id="toggleAllDynamicSectionsBtn" onclick="toggleAllDynamicSections()" class="px-4 py-2 bg-teal-500/10 hover:bg-teal-500/20 text-teal-300 rounded-lg text-sm font-medium transition flex items-center gap-2">
+                        <svg id="toggleAllDynamicIcon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                        <span id="toggleAllDynamicText">Collapse All</span>
+                    </button>
+                </div>
+
+                <!-- Summary Cards -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="glass rounded-xl p-5 fade-in border-l-4 border-purple-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Total Files</p>
+                                <p id="dynTotalFiles" class="text-2xl font-bold text-white">0</p>
+                            </div>
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5 fade-in border-l-4 border-yellow-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">SharedPrefs</p>
+                                <p id="dynSharedPrefs" class="text-2xl font-bold text-yellow-400">0</p>
+                            </div>
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5 fade-in border-l-4 border-blue-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Databases</p>
+                                <p id="dynDatabases" class="text-2xl font-bold text-blue-400">0</p>
+                            </div>
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                                </svg>
+                        </div>
+                    </div>
+                    <div class="glass rounded-xl p-5 fade-in border-l-4 border-red-500">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-400 text-sm">Issues Found</p>
+                                <p id="dynIssuesFound" class="text-2xl font-bold text-red-400">0</p>
+                            </div>
+                            <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SharedPreferences Section -->
+                <div id="dynSharedPrefsSection" class="mb-6 fade-in">
+                    <div class="section-header" onclick="toggleDynamicSection('sharedPrefs')">
+                        <div class="section-header-icon">
+                            <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </div>
+                        <h2 class="section-header-title">📦 SharedPreferences Analysis (SAST)</h2>
+                        <div class="section-header-chevron expanded" id="sharedPrefsChevron">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="sharedPrefsContent" class="collapsible-content expanded">
+                        <div id="sharedPrefsResults" class="space-y-3 pt-4"></div>
+                    </div>
+                </div>
+
+                <!-- SQLite Databases Section -->
+                <div id="dynSqliteSection" class="mb-6 fade-in">
+                    <div class="section-header flex items-center gap-3 cursor-pointer" onclick="toggleDynamicSection('sqlite')">
+                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/>
+                            </svg>
+                        <h2 class="text-xl font-semibold flex-1">🗄️ SQLite Database Analysis (SAST)</h2>
+                        <svg id="sqliteChevron" class="w-5 h-5 text-gray-400 transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                    <div id="sqliteContent" class="collapsible-content expanded">
+                        <div id="sqliteResults" class="space-y-3 pt-4"></div>
+                    </div>
+                </div>
+
+                <!-- Files & Cache Section -->
+                <div id="dynFilesSection" class="mb-6 fade-in">
+                    <div class="section-header flex items-center gap-3 cursor-pointer" onclick="toggleDynamicSection('files')">
+                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z"/>
+                            </svg>
+                        <h2 class="text-xl font-semibold flex-1">📁 Files & Cache Analysis (SAST)</h2>
+                        <svg id="filesChevron" class="w-5 h-5 text-gray-400 transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                    <div id="filesContent" class="collapsible-content expanded">
+                        <div id="filesResults" class="space-y-3 pt-4"></div>
+                    </div>
+                </div>
+
+                <!-- Security Issues Section -->
+                <div id="dynSecuritySection" class="mb-6 fade-in">
+                    <div class="section-header flex items-center gap-3 cursor-pointer" onclick="toggleDynamicSection('security')">
+                        <svg class="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                        <h2 class="text-xl font-semibold flex-1">🚩 Security Issues Found</h2>
+                        <svg id="securityChevron" class="w-5 h-5 text-gray-400 transition-transform rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                    </div>
+                    <div id="securityContent" class="collapsible-content expanded">
+                        <div id="securityResults" class="space-y-3 pt-4"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+
+    </div>

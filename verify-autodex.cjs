@@ -1,0 +1,15 @@
+const fs = require('fs');
+let fail = 0;
+const check = (l, c) => { console.log((c ? 'PASS ' : 'FAIL ') + l); if (!c) fail++; };
+const apk = fs.readFileSync('src/ingest/apk.js', 'utf8');
+check('DEX-BLOCK', apk.includes('await disassembleDexAsync(') && apk.includes('smaliContent'));
+check('MANIFEST-BLOCK', apk.includes("await import('../core/axml.js')") && apk.includes('state.globalAPKData.manifestXml = null'));
+check('SMALI-FEED', apk.includes('// === APK BYTECODE CONTENT ==='));
+check('SMALI-ENDPOINTS', apk.includes("smaliContent + '\\n' + allContent"));
+const man = fs.readFileSync('src/core/manifest.js', 'utf8');
+check('MANIFEST-FALLBACK', man.includes('state.globalAPKData.manifestXml') && man.includes('No manifest available'));
+check('JADX-PREFERRED', man.includes('findAndReadManifest(state.decompiledSourceData.files)'));
+const src = fs.readFileSync('src/ingest/source.js', 'utf8');
+check('HINT-APK', src.includes('DEX auto-disassembly + manifest included'));
+check('HINT-SRC', src.includes('Add APK for endpoint extraction.') && !src.includes('manifest analysis'));
+process.exit(fail ? 1 : 0);

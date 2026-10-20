@@ -1,0 +1,13 @@
+const fs = require('fs');
+const x = JSON.parse(fs.readFileSync(__dirname + '/../xref.json', 'utf8'));
+console.log('KEYS', Object.keys(x));
+console.log('total', x.total);
+const d = x.decls[0];
+console.log('DECL0', JSON.stringify(d));
+const fn = x.decls.find(e => e.kind === 'function' || e.kind === 'fn');
+console.log('FN', JSON.stringify(fn));
+const c = x.decls.find(e => e.kind === 'const');
+console.log('CONST', JSON.stringify(c));
+const m = x.decls.find(e => e.kind === 'let' || e.kind === 'var' || e.mutable);
+console.log('MUT', JSON.stringify(m));
+console.log('KINDS', JSON.stringify([...new Set(x.decls.map(e => e.kind))]));

@@ -1,0 +1,1798 @@
+{
+ "decls": [
+  {
+   "name": "toggleTheme",
+   "kind": "function",
+   "mutable": false,
+   "start": 32,
+   "end": 232,
+   "refs": []
+  },
+  {
+   "name": "allSectionsExpanded",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 490,
+   "end": 521,
+   "refs": []
+  },
+  {
+   "name": "allCodeSectionsExpanded",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 530,
+   "end": 565,
+   "refs": []
+  },
+  {
+   "name": "currentCodeSection",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 574,
+   "end": 604,
+   "refs": []
+  },
+  {
+   "name": "allDynamicSectionsExpanded",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 672,
+   "end": 710,
+   "refs": []
+  },
+  {
+   "name": "toggleAllSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 720,
+   "end": 1322,
+   "refs": [
+    "allSectionsExpanded",
+    "expandAllSections",
+    "collapseAllSections"
+   ]
+  },
+  {
+   "name": "toggleAllCodeSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 1332,
+   "end": 1974,
+   "refs": [
+    "allCodeSectionsExpanded",
+    "expandAllCodeSections",
+    "collapseAllCodeSections"
+   ]
+  },
+  {
+   "name": "toggleAllDynamicSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 1984,
+   "end": 2672,
+   "refs": [
+    "allDynamicSectionsExpanded",
+    "expandAllDynamicSectionsInternal",
+    "collapseAllDynamicSectionsInternal"
+   ]
+  },
+  {
+   "name": "expandAllSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 2682,
+   "end": 3166,
+   "refs": [
+    "allSectionsExpanded"
+   ]
+  },
+  {
+   "name": "collapseAllSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 3176,
+   "end": 3669,
+   "refs": [
+    "allSectionsExpanded"
+   ]
+  },
+  {
+   "name": "expandAllCodeSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 3679,
+   "end": 4719,
+   "refs": [
+    "allCodeSectionsExpanded"
+   ]
+  },
+  {
+   "name": "collapseAllCodeSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 4729,
+   "end": 6032,
+   "refs": [
+    "currentCodeSection",
+    "allCodeSectionsExpanded"
+   ]
+  },
+  {
+   "name": "expandAllDynamicSectionsInternal",
+   "kind": "function",
+   "mutable": false,
+   "start": 6042,
+   "end": 7060,
+   "refs": [
+    "allDynamicSectionsExpanded"
+   ]
+  },
+  {
+   "name": "collapseAllDynamicSectionsInternal",
+   "kind": "function",
+   "mutable": false,
+   "start": 7070,
+   "end": 8092,
+   "refs": [
+    "allDynamicSectionsExpanded"
+   ]
+  },
+  {
+   "name": "toggleSection",
+   "kind": "function",
+   "mutable": false,
+   "start": 8102,
+   "end": 8529,
+   "refs": []
+  },
+  {
+   "name": "toggleSectionChip",
+   "kind": "function",
+   "mutable": false,
+   "start": 8601,
+   "end": 8960,
+   "refs": []
+  },
+  {
+   "name": "updateChipCounts",
+   "kind": "function",
+   "mutable": false,
+   "start": 9040,
+   "end": 9972,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults",
+    "analyzedPermComponents"
+   ]
+  },
+  {
+   "name": "toggleCodeSection",
+   "kind": "function",
+   "mutable": false,
+   "start": 9982,
+   "end": 10413,
+   "refs": []
+  },
+  {
+   "name": "toggleCodeSectionChip",
+   "kind": "function",
+   "mutable": false,
+   "start": 10423,
+   "end": 12572,
+   "refs": [
+    "currentCodeSection",
+    "allCodeSectionsExpanded"
+   ]
+  },
+  {
+   "name": "authenticationChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 12616,
+   "end": 18937,
+   "refs": []
+  },
+  {
+   "name": "authorizationChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 18979,
+   "end": 24794,
+   "refs": []
+  },
+  {
+   "name": "featureFlagsChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 24909,
+   "end": 26664,
+   "refs": []
+  },
+  {
+   "name": "hiddenEndpointsChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 26716,
+   "end": 28340,
+   "refs": []
+  },
+  {
+   "name": "authTrustChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 28409,
+   "end": 30179,
+   "refs": []
+  },
+  {
+   "name": "massAssignmentChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 30230,
+   "end": 31742,
+   "refs": []
+  },
+  {
+   "name": "inputValidationChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 31791,
+   "end": 33517,
+   "refs": []
+  },
+  {
+   "name": "businessLogicChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 33568,
+   "end": 35445,
+   "refs": []
+  },
+  {
+   "name": "sqlInjectionChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 35746,
+   "end": 39382,
+   "refs": []
+  },
+  {
+   "name": "nosqlInjectionChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 39440,
+   "end": 42466,
+   "refs": []
+  },
+  {
+   "name": "ssrfVulnerabilityChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 42529,
+   "end": 45996,
+   "refs": []
+  },
+  {
+   "name": "xxeVulnerabilityChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 46064,
+   "end": 48901,
+   "refs": []
+  },
+  {
+   "name": "deserializationVulnerabilityChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 48968,
+   "end": 52583,
+   "refs": []
+  },
+  {
+   "name": "commandInjectionChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 52643,
+   "end": 55656,
+   "refs": []
+  },
+  {
+   "name": "fileHandlingChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 55710,
+   "end": 57357,
+   "refs": []
+  },
+  {
+   "name": "errorHandlingChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 57413,
+   "end": 58894,
+   "refs": []
+  },
+  {
+   "name": "envLeakageChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 58955,
+   "end": 60562,
+   "refs": []
+  },
+  {
+   "name": "cryptoTrustChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 60615,
+   "end": 62270,
+   "refs": []
+  },
+  {
+   "name": "globalAPKData",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 62305,
+   "end": 62395,
+   "refs": []
+  },
+  {
+   "name": "decompiledSourceData",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 62404,
+   "end": 62510,
+   "refs": []
+  },
+  {
+   "name": "parseManifestPermissions",
+   "kind": "function",
+   "mutable": false,
+   "start": 62808,
+   "end": 66261,
+   "refs": []
+  },
+  {
+   "name": "findAndReadManifest",
+   "kind": "function",
+   "mutable": false,
+   "start": 66550,
+   "end": 68968,
+   "refs": []
+  },
+  {
+   "name": "currentFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 68977,
+   "end": 69003,
+   "refs": []
+  },
+  {
+   "name": "currentCodeFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69012,
+   "end": 69042,
+   "refs": []
+  },
+  {
+   "name": "currentEndpointFilterType",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69051,
+   "end": 69089,
+   "refs": []
+  },
+  {
+   "name": "currentFlagCategoryFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69098,
+   "end": 69136,
+   "refs": []
+  },
+  {
+   "name": "currentStorageCategoryFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69145,
+   "end": 69186,
+   "refs": []
+  },
+  {
+   "name": "currentCryptoCategoryFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69195,
+   "end": 69235,
+   "refs": []
+  },
+  {
+   "name": "currentLoggingCategoryFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69244,
+   "end": 69285,
+   "refs": []
+  },
+  {
+   "name": "currentRootResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69294,
+   "end": 69483,
+   "refs": [
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults"
+   ]
+  },
+  {
+   "name": "currentEmulatorResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69294,
+   "end": 69483,
+   "refs": [
+    "currentRootResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults"
+   ]
+  },
+  {
+   "name": "currentSSLResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69294,
+   "end": 69483,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults"
+   ]
+  },
+  {
+   "name": "currentFlagResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69294,
+   "end": 69483,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults"
+   ]
+  },
+  {
+   "name": "currentStorageResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69294,
+   "end": 69483,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentCryptoResults",
+    "currentLoggingResults"
+   ]
+  },
+  {
+   "name": "currentCryptoResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69294,
+   "end": 69483,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentLoggingResults"
+   ]
+  },
+  {
+   "name": "currentLoggingResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69294,
+   "end": 69483,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults"
+   ]
+  },
+  {
+   "name": "currentAuthResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69492,
+   "end": 69546,
+   "refs": [
+    "currentAuthzResults"
+   ]
+  },
+  {
+   "name": "currentAuthzResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69492,
+   "end": 69546,
+   "refs": [
+    "currentAuthResults"
+   ]
+  },
+  {
+   "name": "currentFeatureFlagsResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69555,
+   "end": 69657,
+   "refs": [
+    "currentHiddenEndpointsResults",
+    "currentAuthTrustResults"
+   ]
+  },
+  {
+   "name": "currentHiddenEndpointsResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69555,
+   "end": 69657,
+   "refs": [
+    "currentFeatureFlagsResults",
+    "currentAuthTrustResults"
+   ]
+  },
+  {
+   "name": "currentAuthTrustResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69555,
+   "end": 69657,
+   "refs": [
+    "currentFeatureFlagsResults",
+    "currentHiddenEndpointsResults"
+   ]
+  },
+  {
+   "name": "currentMassAssignmentResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69666,
+   "end": 69774,
+   "refs": [
+    "currentInputValidationResults",
+    "currentBusinessLogicResults"
+   ]
+  },
+  {
+   "name": "currentInputValidationResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69666,
+   "end": 69774,
+   "refs": [
+    "currentMassAssignmentResults",
+    "currentBusinessLogicResults"
+   ]
+  },
+  {
+   "name": "currentBusinessLogicResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69666,
+   "end": 69774,
+   "refs": [
+    "currentMassAssignmentResults",
+    "currentInputValidationResults"
+   ]
+  },
+  {
+   "name": "currentFileHandlingResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69783,
+   "end": 69916,
+   "refs": [
+    "currentErrorHandlingResults",
+    "currentEnvLeakageResults",
+    "currentCryptoTrustResults"
+   ]
+  },
+  {
+   "name": "currentErrorHandlingResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69783,
+   "end": 69916,
+   "refs": [
+    "currentFileHandlingResults",
+    "currentEnvLeakageResults",
+    "currentCryptoTrustResults"
+   ]
+  },
+  {
+   "name": "currentEnvLeakageResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69783,
+   "end": 69916,
+   "refs": [
+    "currentFileHandlingResults",
+    "currentErrorHandlingResults",
+    "currentCryptoTrustResults"
+   ]
+  },
+  {
+   "name": "currentCryptoTrustResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69783,
+   "end": 69916,
+   "refs": [
+    "currentFileHandlingResults",
+    "currentErrorHandlingResults",
+    "currentEnvLeakageResults"
+   ]
+  },
+  {
+   "name": "currentSqlInjectionResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69979,
+   "end": 70075,
+   "refs": [
+    "currentNosqlInjectionResults",
+    "currentSsrfResults"
+   ]
+  },
+  {
+   "name": "currentNosqlInjectionResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69979,
+   "end": 70075,
+   "refs": [
+    "currentSqlInjectionResults",
+    "currentSsrfResults"
+   ]
+  },
+  {
+   "name": "currentSsrfResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 69979,
+   "end": 70075,
+   "refs": [
+    "currentSqlInjectionResults",
+    "currentNosqlInjectionResults"
+   ]
+  },
+  {
+   "name": "currentXxeResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70084,
+   "end": 70184,
+   "refs": [
+    "currentDeserializationResults",
+    "currentCommandInjectionResults"
+   ]
+  },
+  {
+   "name": "currentDeserializationResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70084,
+   "end": 70184,
+   "refs": [
+    "currentXxeResults",
+    "currentCommandInjectionResults"
+   ]
+  },
+  {
+   "name": "currentCommandInjectionResults",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70084,
+   "end": 70184,
+   "refs": [
+    "currentXxeResults",
+    "currentDeserializationResults"
+   ]
+  },
+  {
+   "name": "extractedEndpoints",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70193,
+   "end": 70221,
+   "refs": []
+  },
+  {
+   "name": "currentEndpointFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70230,
+   "end": 70264,
+   "refs": []
+  },
+  {
+   "name": "currentEndpointSection",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70273,
+   "end": 70307,
+   "refs": []
+  },
+  {
+   "name": "allEndpointSectionsExpanded",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70316,
+   "end": 70355,
+   "refs": []
+  },
+  {
+   "name": "analyzedComponents",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70364,
+   "end": 70392,
+   "refs": []
+  },
+  {
+   "name": "customPermissions",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70401,
+   "end": 70428,
+   "refs": []
+  },
+  {
+   "name": "appPermission",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70437,
+   "end": 70462,
+   "refs": []
+  },
+  {
+   "name": "currentPermFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70471,
+   "end": 70501,
+   "refs": []
+  },
+  {
+   "name": "currentComponentTypeFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70510,
+   "end": 70549,
+   "refs": []
+  },
+  {
+   "name": "currentComponentFilter",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70558,
+   "end": 70593,
+   "refs": []
+  },
+  {
+   "name": "analyzedPermComponents",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 70602,
+   "end": 70634,
+   "refs": []
+  },
+  {
+   "name": "NORMAL_PERMISSIONS",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 70715,
+   "end": 71450,
+   "refs": []
+  },
+  {
+   "name": "DANGEROUS_PERMISSIONS",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 71468,
+   "end": 72762,
+   "refs": []
+  },
+  {
+   "name": "SIGNATURE_PERMISSIONS",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 72780,
+   "end": 73375,
+   "refs": []
+  },
+  {
+   "name": "SIGNATURE_PRIVILEGED_PERMISSIONS",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 73393,
+   "end": 73921,
+   "refs": []
+  },
+  {
+   "name": "INTERNAL_SYSTEM_PERMISSIONS",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 73939,
+   "end": 74315,
+   "refs": []
+  },
+  {
+   "name": "APPOPS_PERMISSIONS",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 74333,
+   "end": 74572,
+   "refs": []
+  },
+  {
+   "name": "classifyAndroidPermission",
+   "kind": "function",
+   "mutable": false,
+   "start": 74650,
+   "end": 75413,
+   "refs": [
+    "DANGEROUS_PERMISSIONS",
+    "SIGNATURE_PRIVILEGED_PERMISSIONS",
+    "SIGNATURE_PERMISSIONS",
+    "INTERNAL_SYSTEM_PERMISSIONS",
+    "APPOPS_PERMISSIONS",
+    "NORMAL_PERMISSIONS"
+   ]
+  },
+  {
+   "name": "resolvePermissionWithRisk",
+   "kind": "function",
+   "mutable": false,
+   "start": 75498,
+   "end": 76885,
+   "refs": [
+    "classifyAndroidPermission"
+   ]
+  },
+  {
+   "name": "analyzePermissionsFromManifest",
+   "kind": "function",
+   "mutable": false,
+   "start": 76959,
+   "end": 81237,
+   "refs": [
+    "decompiledSourceData",
+    "findAndReadManifest",
+    "parseManifestPermissions",
+    "analyzedPermComponents",
+    "resolvePermissionWithRisk",
+    "displayPermissionAnalysis"
+   ]
+  },
+  {
+   "name": "displayPermissionAnalysis",
+   "kind": "function",
+   "mutable": false,
+   "start": 81302,
+   "end": 83045,
+   "refs": [
+    "analyzedPermComponents",
+    "renderPermissionComponents"
+   ]
+  },
+  {
+   "name": "renderPermissionComponents",
+   "kind": "function",
+   "mutable": false,
+   "start": 83115,
+   "end": 86757,
+   "refs": [
+    "analyzedPermComponents",
+    "currentComponentFilter",
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "setComponentFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 86807,
+   "end": 87246,
+   "refs": [
+    "currentComponentFilter",
+    "renderPermissionComponents"
+   ]
+  },
+  {
+   "name": "rootChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 87345,
+   "end": 88388,
+   "refs": []
+  },
+  {
+   "name": "emulatorChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 88398,
+   "end": 89123,
+   "refs": []
+  },
+  {
+   "name": "sslPinningChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 89133,
+   "end": 89774,
+   "refs": []
+  },
+  {
+   "name": "flagChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 89784,
+   "end": 91689,
+   "refs": []
+  },
+  {
+   "name": "localStorageChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 91699,
+   "end": 99842,
+   "refs": []
+  },
+  {
+   "name": "cryptographyChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 99852,
+   "end": 101383,
+   "refs": []
+  },
+  {
+   "name": "insecureLoggingChecks",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 101393,
+   "end": 107473,
+   "refs": []
+  },
+  {
+   "name": "handleAPKSelected",
+   "kind": "function",
+   "mutable": false,
+   "start": 110208,
+   "end": 110566,
+   "refs": [
+    "globalAPKData",
+    "updateAnalysisHint"
+   ]
+  },
+  {
+   "name": "handleDecompiledFolderSelected",
+   "kind": "function",
+   "mutable": false,
+   "start": 110622,
+   "end": 113388,
+   "refs": [
+    "decompiledSourceData",
+    "updateAnalysisHint"
+   ]
+  },
+  {
+   "name": "handleDroppedDecompiledItems",
+   "kind": "function",
+   "mutable": false,
+   "start": 113452,
+   "end": 114124,
+   "refs": [
+    "readDirectoryRecursiveForSource",
+    "handleDecompiledFolderSelected"
+   ]
+  },
+  {
+   "name": "readDirectoryRecursiveForSource",
+   "kind": "function",
+   "mutable": false,
+   "start": 114134,
+   "end": 114904,
+   "refs": []
+  },
+  {
+   "name": "updateAnalysisHint",
+   "kind": "function",
+   "mutable": false,
+   "start": 114914,
+   "end": 115607,
+   "refs": [
+    "globalAPKData",
+    "decompiledSourceData"
+   ]
+  },
+  {
+   "name": "startGlobalAnalysis",
+   "kind": "function",
+   "mutable": false,
+   "start": 115672,
+   "end": 116200,
+   "refs": [
+    "globalAPKData",
+    "decompiledSourceData",
+    "analyzeAPKGlobal",
+    "analyzeDecompiledSourceOnly"
+   ]
+  },
+  {
+   "name": "analyzeDecompiledSourceOnly",
+   "kind": "function",
+   "mutable": false,
+   "start": 116275,
+   "end": 121833,
+   "refs": [
+    "decompiledSourceData",
+    "currentRootResults",
+    "analyzePatterns",
+    "rootChecks",
+    "currentEmulatorResults",
+    "emulatorChecks",
+    "currentSSLResults",
+    "sslPinningChecks",
+    "currentFlagResults",
+    "flagChecks",
+    "currentStorageResults",
+    "localStorageChecks",
+    "currentCryptoResults",
+    "cryptographyChecks",
+    "currentLoggingResults",
+    "insecureLoggingChecks",
+    "currentAuthResults",
+    "authenticationChecks",
+    "currentAuthzResults",
+    "authorizationChecks",
+    "currentFeatureFlagsResults",
+    "featureFlagsChecks",
+    "currentHiddenEndpointsResults",
+    "hiddenEndpointsChecks",
+    "currentAuthTrustResults",
+    "authTrustChecks",
+    "currentMassAssignmentResults",
+    "massAssignmentChecks",
+    "currentInputValidationResults",
+    "inputValidationChecks",
+    "currentBusinessLogicResults",
+    "businessLogicChecks",
+    "currentFileHandlingResults",
+    "fileHandlingChecks",
+    "currentErrorHandlingResults",
+    "errorHandlingChecks",
+    "currentEnvLeakageResults",
+    "envLeakageChecks",
+    "currentCryptoTrustResults",
+    "cryptoTrustChecks",
+    "currentSqlInjectionResults",
+    "sqlInjectionChecks",
+    "currentNosqlInjectionResults",
+    "nosqlInjectionChecks",
+    "currentSsrfResults",
+    "ssrfVulnerabilityChecks",
+    "currentXxeResults",
+    "xxeVulnerabilityChecks",
+    "currentDeserializationResults",
+    "deserializationVulnerabilityChecks",
+    "currentCommandInjectionResults",
+    "commandInjectionChecks",
+    "extractedEndpoints",
+    "extractEndpoints",
+    "analyzePermissionsFromManifest",
+    "displayAllResults",
+    "globalAPKData",
+    "resetGlobalAnalyzer"
+   ]
+  },
+  {
+   "name": "navigateTo",
+   "kind": "function",
+   "mutable": false,
+   "start": 121843,
+   "end": 122413,
+   "refs": []
+  },
+  {
+   "name": "analyzeAPKGlobal",
+   "kind": "function",
+   "mutable": false,
+   "start": 122423,
+   "end": 129261,
+   "refs": [
+    "globalAPKData",
+    "decompiledSourceData",
+    "currentRootResults",
+    "analyzePatterns",
+    "rootChecks",
+    "currentEmulatorResults",
+    "emulatorChecks",
+    "currentSSLResults",
+    "sslPinningChecks",
+    "currentFlagResults",
+    "flagChecks",
+    "currentStorageResults",
+    "localStorageChecks",
+    "currentCryptoResults",
+    "cryptographyChecks",
+    "currentLoggingResults",
+    "insecureLoggingChecks",
+    "currentAuthResults",
+    "authenticationChecks",
+    "currentAuthzResults",
+    "authorizationChecks",
+    "currentFeatureFlagsResults",
+    "featureFlagsChecks",
+    "currentHiddenEndpointsResults",
+    "hiddenEndpointsChecks",
+    "currentAuthTrustResults",
+    "authTrustChecks",
+    "currentMassAssignmentResults",
+    "massAssignmentChecks",
+    "currentInputValidationResults",
+    "inputValidationChecks",
+    "currentBusinessLogicResults",
+    "businessLogicChecks",
+    "currentFileHandlingResults",
+    "fileHandlingChecks",
+    "currentErrorHandlingResults",
+    "errorHandlingChecks",
+    "currentEnvLeakageResults",
+    "envLeakageChecks",
+    "currentCryptoTrustResults",
+    "cryptoTrustChecks",
+    "currentSqlInjectionResults",
+    "sqlInjectionChecks",
+    "currentNosqlInjectionResults",
+    "nosqlInjectionChecks",
+    "currentSsrfResults",
+    "ssrfVulnerabilityChecks",
+    "currentXxeResults",
+    "xxeVulnerabilityChecks",
+    "currentDeserializationResults",
+    "deserializationVulnerabilityChecks",
+    "currentCommandInjectionResults",
+    "commandInjectionChecks",
+    "extractedEndpoints",
+    "extractEndpoints",
+    "analyzePermissionsFromManifest",
+    "formatFileSize",
+    "displayAllResults",
+    "resetGlobalAnalyzer"
+   ]
+  },
+  {
+   "name": "displayAllResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 129271,
+   "end": 130117,
+   "refs": [
+    "displayMisconfigResults",
+    "displayCodeAnalysisResults",
+    "collapseAllCodeSections",
+    "displayEndpointResults"
+   ]
+  },
+  {
+   "name": "displayMisconfigResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 130127,
+   "end": 134183,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults",
+    "decompiledSourceData",
+    "renderFilteredResults",
+    "updateChipCounts"
+   ]
+  },
+  {
+   "name": "displayCodeAnalysisResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 134193,
+   "end": 139394,
+   "refs": [
+    "currentAuthResults",
+    "currentAuthzResults",
+    "currentFeatureFlagsResults",
+    "currentHiddenEndpointsResults",
+    "currentAuthTrustResults",
+    "currentMassAssignmentResults",
+    "currentBusinessLogicResults",
+    "currentFileHandlingResults",
+    "currentErrorHandlingResults",
+    "currentEnvLeakageResults",
+    "currentCryptoTrustResults",
+    "currentInputValidationResults",
+    "currentSqlInjectionResults",
+    "currentNosqlInjectionResults",
+    "currentSsrfResults",
+    "currentXxeResults",
+    "currentDeserializationResults",
+    "currentCommandInjectionResults",
+    "renderSection",
+    "renderBackendRiskIndicators",
+    "renderServerSideVulnerabilities"
+   ]
+  },
+  {
+   "name": "renderBackendRiskIndicators",
+   "kind": "function",
+   "mutable": false,
+   "start": 139412,
+   "end": 144516,
+   "refs": [
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "renderServerSideVulnerabilities",
+   "kind": "function",
+   "mutable": false,
+   "start": 144526,
+   "end": 151131,
+   "refs": [
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "analyzePatterns",
+   "kind": "function",
+   "mutable": false,
+   "start": 151141,
+   "end": 156553,
+   "refs": []
+  },
+  {
+   "name": "renderFilteredResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 156563,
+   "end": 159282,
+   "refs": [
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults",
+    "currentFilter",
+    "currentFlagCategoryFilter",
+    "currentStorageCategoryFilter",
+    "currentCryptoCategoryFilter",
+    "currentLoggingCategoryFilter",
+    "renderSection"
+   ]
+  },
+  {
+   "name": "renderSection",
+   "kind": "function",
+   "mutable": false,
+   "start": 159292,
+   "end": 159740,
+   "refs": [
+    "createCheckCard"
+   ]
+  },
+  {
+   "name": "createCheckCard",
+   "kind": "function",
+   "mutable": false,
+   "start": 159750,
+   "end": 165257,
+   "refs": [
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "toggleInstances",
+   "kind": "function",
+   "mutable": false,
+   "start": 165275,
+   "end": 165864,
+   "refs": []
+  },
+  {
+   "name": "setFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 165874,
+   "end": 166312,
+   "refs": [
+    "currentFilter",
+    "renderFilteredResults"
+   ]
+  },
+  {
+   "name": "setFlagCategoryFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 166322,
+   "end": 166698,
+   "refs": [
+    "currentFlagCategoryFilter",
+    "renderFilteredResults"
+   ]
+  },
+  {
+   "name": "setStorageCategoryFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 166708,
+   "end": 167329,
+   "refs": [
+    "currentStorageCategoryFilter",
+    "renderFilteredResults"
+   ]
+  },
+  {
+   "name": "setCryptoCategoryFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 167339,
+   "end": 168057,
+   "refs": [
+    "currentCryptoCategoryFilter",
+    "renderFilteredResults"
+   ]
+  },
+  {
+   "name": "setLoggingCategoryFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 168067,
+   "end": 168596,
+   "refs": [
+    "currentLoggingCategoryFilter",
+    "renderFilteredResults"
+   ]
+  },
+  {
+   "name": "extractEndpoints",
+   "kind": "function",
+   "mutable": false,
+   "start": 168637,
+   "end": 171549,
+   "refs": [
+    "extractedEndpoints"
+   ]
+  },
+  {
+   "name": "displayEndpointResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 171559,
+   "end": 174086,
+   "refs": [
+    "extractedEndpoints",
+    "renderEndpoints"
+   ]
+  },
+  {
+   "name": "renderEndpoints",
+   "kind": "function",
+   "mutable": false,
+   "start": 174096,
+   "end": 177229,
+   "refs": [
+    "extractedEndpoints",
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "filterEndpointsBySearch",
+   "kind": "function",
+   "mutable": false,
+   "start": 177239,
+   "end": 177296,
+   "refs": [
+    "renderEndpoints"
+   ]
+  },
+  {
+   "name": "toggleEndpointSectionsExpandCollapse",
+   "kind": "function",
+   "mutable": false,
+   "start": 177314,
+   "end": 177733,
+   "refs": [
+    "allEndpointSectionsExpanded",
+    "collapseAllEndpointSections",
+    "expandAllEndpointSections"
+   ]
+  },
+  {
+   "name": "expandAllEndpointSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 177751,
+   "end": 178149,
+   "refs": [
+    "allEndpointSectionsExpanded"
+   ]
+  },
+  {
+   "name": "collapseAllEndpointSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 178167,
+   "end": 178794,
+   "refs": [
+    "currentEndpointSection",
+    "allEndpointSectionsExpanded"
+   ]
+  },
+  {
+   "name": "toggleEndpointSectionChip",
+   "kind": "function",
+   "mutable": false,
+   "start": 178812,
+   "end": 179911,
+   "refs": [
+    "currentEndpointSection",
+    "allEndpointSectionsExpanded"
+   ]
+  },
+  {
+   "name": "setCodeFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 179929,
+   "end": 180362,
+   "refs": [
+    "currentCodeFilter"
+   ]
+  },
+  {
+   "name": "setEndpointFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 180380,
+   "end": 180849,
+   "refs": [
+    "currentEndpointFilterType"
+   ]
+  },
+  {
+   "name": "exportEndpoints",
+   "kind": "function",
+   "mutable": false,
+   "start": 180867,
+   "end": 181198,
+   "refs": [
+    "extractedEndpoints"
+   ]
+  },
+  {
+   "name": "setPermFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 181208,
+   "end": 181524,
+   "refs": [
+    "currentPermFilter"
+   ]
+  },
+  {
+   "name": "setComponentTypeFilter",
+   "kind": "function",
+   "mutable": false,
+   "start": 181534,
+   "end": 181860,
+   "refs": [
+    "currentComponentTypeFilter"
+   ]
+  },
+  {
+   "name": "exportPermissions",
+   "kind": "function",
+   "mutable": false,
+   "start": 181870,
+   "end": 181933,
+   "refs": []
+  },
+  {
+   "name": "resetGlobalAnalyzer",
+   "kind": "function",
+   "mutable": false,
+   "start": 181943,
+   "end": 183901,
+   "refs": [
+    "globalAPKData",
+    "decompiledSourceData",
+    "analyzedPermComponents",
+    "currentComponentFilter"
+   ]
+  },
+  {
+   "name": "copyToClipboard",
+   "kind": "function",
+   "mutable": false,
+   "start": 183911,
+   "end": 184354,
+   "refs": []
+  },
+  {
+   "name": "formatFileSize",
+   "kind": "function",
+   "mutable": false,
+   "start": 184364,
+   "end": 184668,
+   "refs": []
+  },
+  {
+   "name": "escapeHtml",
+   "kind": "function",
+   "mutable": false,
+   "start": 184678,
+   "end": 184840,
+   "refs": []
+  },
+  {
+   "name": "dynamicAnalysisData",
+   "kind": "varDecl",
+   "mutable": true,
+   "start": 184929,
+   "end": 185097,
+   "refs": []
+  },
+  {
+   "name": "handleDroppedItems",
+   "kind": "function",
+   "mutable": false,
+   "start": 186490,
+   "end": 187068,
+   "refs": [
+    "readDirectoryRecursive",
+    "analyzeDynamicFolder"
+   ]
+  },
+  {
+   "name": "readDirectoryRecursive",
+   "kind": "function",
+   "mutable": false,
+   "start": 187078,
+   "end": 187830,
+   "refs": []
+  },
+  {
+   "name": "analyzeDynamicFolder",
+   "kind": "function",
+   "mutable": false,
+   "start": 187840,
+   "end": 190945,
+   "refs": [
+    "dynamicAnalysisData",
+    "analyzeSharedPreferences",
+    "analyzeSQLiteDatabases",
+    "analyzeOtherFiles",
+    "displayDynamicResults"
+   ]
+  },
+  {
+   "name": "sensitivePatterns",
+   "kind": "varDecl",
+   "mutable": false,
+   "start": 191004,
+   "end": 191823,
+   "refs": []
+  },
+  {
+   "name": "analyzeSharedPreferences",
+   "kind": "function",
+   "mutable": false,
+   "start": 191833,
+   "end": 195183,
+   "refs": [
+    "dynamicAnalysisData",
+    "sensitivePatterns",
+    "maskValue"
+   ]
+  },
+  {
+   "name": "analyzeSQLiteDatabases",
+   "kind": "function",
+   "mutable": false,
+   "start": 195193,
+   "end": 199997,
+   "refs": [
+    "dynamicAnalysisData",
+    "sensitivePatterns"
+   ]
+  },
+  {
+   "name": "analyzeOtherFiles",
+   "kind": "function",
+   "mutable": false,
+   "start": 200007,
+   "end": 209979,
+   "refs": [
+    "dynamicAnalysisData",
+    "sensitivePatterns"
+   ]
+  },
+  {
+   "name": "maskValue",
+   "kind": "function",
+   "mutable": false,
+   "start": 209989,
+   "end": 210171,
+   "refs": []
+  },
+  {
+   "name": "displayDynamicResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 210181,
+   "end": 211126,
+   "refs": [
+    "dynamicAnalysisData",
+    "renderSharedPrefsResults",
+    "renderSQLiteResults",
+    "renderFilesResults",
+    "renderSecurityIssues"
+   ]
+  },
+  {
+   "name": "renderSharedPrefsResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 211136,
+   "end": 215909,
+   "refs": [
+    "dynamicAnalysisData",
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "renderSQLiteResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 215919,
+   "end": 219928,
+   "refs": [
+    "dynamicAnalysisData",
+    "formatFileSize",
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "renderFilesResults",
+   "kind": "function",
+   "mutable": false,
+   "start": 219938,
+   "end": 222376,
+   "refs": [
+    "dynamicAnalysisData",
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "renderSecurityIssues",
+   "kind": "function",
+   "mutable": false,
+   "start": 222386,
+   "end": 228320,
+   "refs": [
+    "dynamicAnalysisData",
+    "escapeHtml"
+   ]
+  },
+  {
+   "name": "toggleDynamicSection",
+   "kind": "function",
+   "mutable": false,
+   "start": 228330,
+   "end": 229240,
+   "refs": []
+  },
+  {
+   "name": "toggleDynamicInstances",
+   "kind": "function",
+   "mutable": false,
+   "start": 229250,
+   "end": 229797,
+   "refs": []
+  },
+  {
+   "name": "expandAllDynamicSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 229807,
+   "end": 230770,
+   "refs": []
+  },
+  {
+   "name": "collapseAllDynamicSections",
+   "kind": "function",
+   "mutable": false,
+   "start": 230780,
+   "end": 231746,
+   "refs": []
+  },
+  {
+   "name": "resetDynamicAnalysis",
+   "kind": "function",
+   "mutable": false,
+   "start": 231756,
+   "end": 232423,
+   "refs": [
+    "dynamicAnalysisData"
+   ]
+  }
+ ],
+ "handlerNames": [
+  "toggleTheme",
+  "navigateTo",
+  "startGlobalAnalysis",
+  "resetGlobalAnalyzer",
+  "toggleAllSections",
+  "setFilter",
+  "toggleSectionChip",
+  "setFlagCategoryFilter",
+  "setStorageCategoryFilter",
+  "setCryptoCategoryFilter",
+  "setComponentFilter",
+  "setLoggingCategoryFilter",
+  "toggleAllCodeSections",
+  "setCodeFilter",
+  "toggleCodeSectionChip",
+  "toggleCodeSection",
+  "exportEndpoints",
+  "toggleEndpointSectionsExpandCollapse",
+  "setEndpointFilter",
+  "filterEndpointsBySearch",
+  "toggleEndpointSectionChip",
+  "resetDynamicAnalysis",
+  "toggleAllDynamicSections",
+  "toggleDynamicSection"
+ ]
+}

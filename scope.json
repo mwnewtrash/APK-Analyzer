@@ -1,0 +1,286 @@
+{
+  "codeLines": 3570,
+  "topStatementCount": 149,
+  "domContentLoaded": [
+    {
+      "stmtStartLine": 1421,
+      "stmtEndLine": 1473,
+      "bodyStartLine": 1421,
+      "bodyEndLine": 1473
+    },
+    {
+      "stmtStartLine": 2742,
+      "stmtEndLine": 2766,
+      "bodyStartLine": 2742,
+      "bodyEndLine": 2766
+    }
+  ],
+  "topFunctionCount": 82,
+  "topConstCount": 82,
+  "inlineHandlers": [
+    {
+      "name": "toggleTheme",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "navigateTo",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "startGlobalAnalysis",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "resetGlobalAnalyzer",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleAllSections",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleSectionChip",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setFlagCategoryFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setStorageCategoryFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setCryptoCategoryFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setComponentFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setLoggingCategoryFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleAllCodeSections",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setCodeFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleCodeSectionChip",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleCodeSection",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "exportEndpoints",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleEndpointSectionsExpandCollapse",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "setEndpointFilter",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "filterEndpointsBySearch",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleEndpointSectionChip",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "resetDynamicAnalysis",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleAllDynamicSections",
+      "isTopLevelFn": true
+    },
+    {
+      "name": "toggleDynamicSection",
+      "isTopLevelFn": true
+    }
+  ],
+  "topFns": [
+    "toggleTheme",
+    "toggleAllSections",
+    "toggleAllCodeSections",
+    "toggleAllDynamicSections",
+    "expandAllSections",
+    "collapseAllSections",
+    "expandAllCodeSections",
+    "collapseAllCodeSections",
+    "expandAllDynamicSectionsInternal",
+    "collapseAllDynamicSectionsInternal",
+    "toggleSection",
+    "toggleSectionChip",
+    "updateChipCounts",
+    "toggleCodeSection",
+    "toggleCodeSectionChip",
+    "parseManifestPermissions",
+    "findAndReadManifest",
+    "classifyAndroidPermission",
+    "resolvePermissionWithRisk",
+    "analyzePermissionsFromManifest",
+    "displayPermissionAnalysis",
+    "renderPermissionComponents",
+    "setComponentFilter",
+    "handleAPKSelected",
+    "handleDecompiledFolderSelected",
+    "handleDroppedDecompiledItems",
+    "readDirectoryRecursiveForSource",
+    "updateAnalysisHint",
+    "startGlobalAnalysis",
+    "analyzeDecompiledSourceOnly",
+    "navigateTo",
+    "analyzeAPKGlobal",
+    "displayAllResults",
+    "displayMisconfigResults",
+    "displayCodeAnalysisResults",
+    "renderBackendRiskIndicators",
+    "renderServerSideVulnerabilities",
+    "analyzePatterns",
+    "renderFilteredResults",
+    "renderSection",
+    "createCheckCard",
+    "toggleInstances",
+    "setFilter",
+    "setFlagCategoryFilter",
+    "setStorageCategoryFilter",
+    "setCryptoCategoryFilter",
+    "setLoggingCategoryFilter",
+    "extractEndpoints",
+    "displayEndpointResults",
+    "renderEndpoints",
+    "filterEndpointsBySearch",
+    "toggleEndpointSectionsExpandCollapse",
+    "expandAllEndpointSections",
+    "collapseAllEndpointSections",
+    "toggleEndpointSectionChip",
+    "setCodeFilter",
+    "setEndpointFilter",
+    "exportEndpoints",
+    "setPermFilter",
+    "setComponentTypeFilter",
+    "exportPermissions",
+    "resetGlobalAnalyzer",
+    "copyToClipboard",
+    "formatFileSize",
+    "escapeHtml",
+    "handleDroppedItems",
+    "readDirectoryRecursive",
+    "analyzeDynamicFolder",
+    "analyzeSharedPreferences",
+    "analyzeSQLiteDatabases",
+    "analyzeOtherFiles",
+    "maskValue",
+    "displayDynamicResults",
+    "renderSharedPrefsResults",
+    "renderSQLiteResults",
+    "renderFilesResults",
+    "renderSecurityIssues",
+    "toggleDynamicSection",
+    "toggleDynamicInstances",
+    "expandAllDynamicSections",
+    "collapseAllDynamicSections",
+    "resetDynamicAnalysis"
+  ],
+  "topConsts": [
+    "allSectionsExpanded",
+    "allCodeSectionsExpanded",
+    "currentCodeSection",
+    "allDynamicSectionsExpanded",
+    "authenticationChecks",
+    "authorizationChecks",
+    "featureFlagsChecks",
+    "hiddenEndpointsChecks",
+    "authTrustChecks",
+    "massAssignmentChecks",
+    "inputValidationChecks",
+    "businessLogicChecks",
+    "sqlInjectionChecks",
+    "nosqlInjectionChecks",
+    "ssrfVulnerabilityChecks",
+    "xxeVulnerabilityChecks",
+    "deserializationVulnerabilityChecks",
+    "commandInjectionChecks",
+    "fileHandlingChecks",
+    "errorHandlingChecks",
+    "envLeakageChecks",
+    "cryptoTrustChecks",
+    "globalAPKData",
+    "decompiledSourceData",
+    "currentFilter",
+    "currentCodeFilter",
+    "currentEndpointFilterType",
+    "currentFlagCategoryFilter",
+    "currentStorageCategoryFilter",
+    "currentCryptoCategoryFilter",
+    "currentLoggingCategoryFilter",
+    "currentRootResults",
+    "currentEmulatorResults",
+    "currentSSLResults",
+    "currentFlagResults",
+    "currentStorageResults",
+    "currentCryptoResults",
+    "currentLoggingResults",
+    "currentAuthResults",
+    "currentAuthzResults",
+    "currentFeatureFlagsResults",
+    "currentHiddenEndpointsResults",
+    "currentAuthTrustResults",
+    "currentMassAssignmentResults",
+    "currentInputValidationResults",
+    "currentBusinessLogicResults",
+    "currentFileHandlingResults",
+    "currentErrorHandlingResults",
+    "currentEnvLeakageResults",
+    "currentCryptoTrustResults",
+    "currentSqlInjectionResults",
+    "currentNosqlInjectionResults",
+    "currentSsrfResults",
+    "currentXxeResults",
+    "currentDeserializationResults",
+    "currentCommandInjectionResults",
+    "extractedEndpoints",
+    "currentEndpointFilter",
+    "currentEndpointSection",
+    "allEndpointSectionsExpanded",
+    "analyzedComponents",
+    "customPermissions",
+    "appPermission",
+    "currentPermFilter",
+    "currentComponentTypeFilter",
+    "currentComponentFilter",
+    "analyzedPermComponents",
+    "NORMAL_PERMISSIONS",
+    "DANGEROUS_PERMISSIONS",
+    "SIGNATURE_PERMISSIONS",
+    "SIGNATURE_PRIVILEGED_PERMISSIONS",
+    "INTERNAL_SYSTEM_PERMISSIONS",
+    "APPOPS_PERMISSIONS",
+    "rootChecks",
+    "emulatorChecks",
+    "sslPinningChecks",
+    "flagChecks",
+    "localStorageChecks",
+    "cryptographyChecks",
+    "insecureLoggingChecks",
+    "dynamicAnalysisData",
+    "sensitivePatterns"
+  ]
+}

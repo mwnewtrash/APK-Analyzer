@@ -1,0 +1,168 @@
+﻿
+### analyzePatterns [function] refs-> analyzePatterns
+function analyzePatterns(content, checks, usingDecompiledSource = false) {
+            const lower = content.toLowerCase();
+            const lines = content.split('\n');
+            
+            // Track current file for decompiled source
+            let currentFile = '';
+            const fileLineMap = new Map(); // Track line numbers per file
+            
+            return checks.map(check => {
+                const matchedPatterns = check.patterns.filter(p => lower.includes(p.toLowerCase()));
+                const instances = [];
+                
+                // Find actual instances with line numbers and better context
+                if (matchedPatterns.length > 0) {
+                    let fileLineNumber = 0;
+                    currentFile = '';
+                    
+                    for (let i = 0; i < lines.length && instances.length < 20; i++) {
+                        const line = lines[i];
+                        const lineLower = line.toLowerCase();
+                        
+                        // Track file changes in decompiled source
+                        if (line.startsWith('// FILE: ')) {
+                            currentFile = line.replace('// FILE: ', '').trim();
+                            fileLineNumber = 0;
+                            continue;
+                        }
+                        fileLineNumber++;
+                        
+                        for (const pattern of matchedPatterns) {
+                            if (lineLower.includes(pattern.toLowerCase())) {
+                                let trimmedLine = line.trim();
+                                
+                                // Skip very short lines or pure comments (but keep import statements)
+                                if (trimmedLine.length < 3) continue;
+                                if (trimmedLine === '{' || trimmedLine === '}' || trimmedLine === '};') continue;
+                                
+                                // Determine if this is source code or smali
+                                const isSourceFile = currentFile && (currentFile.endsWith('.java') || currentFile.endsWith('.kt'));
+                                const isSmaliContent = !isSourceFile && (
+                                    trimmedLine.includes('Landroid/') || 
+                                    trimmedLine.includes(';->') ||
+                                    trimmedLine.startsWith('.') ||
+                                    /^(invoke|iget|iput|sget|sput|const|move|return|if-|goto)/.test(trimmedLine)
+                                );
+                                
+                                // For smali content, try to extract meaningful strings
+                                if (isSmaliContent) {
+                                    // Extract string value from const-string
+                                    if (trimmedLine.includes('const-string')) {
+                                        const stringMatch = trimmedLine.match(/const-string[^"]*"([^"]+)"/);
+                                        if (stringMatch) {
+                                            trimmedLine = `String: "${stringMatch[1]}"`;
+                                        }
+                                    } else if (trimmedLine.startsWith('.field') || trimmedLine.startsWith('.method')) {
+                                        // Keep field and method declarations as they're useful
+                                    } else if (trimmedLine.length < 15) {
+                                        // Skip very short smali instructions
+                                        continue;
+                                    }
+                                }
+                                
+                                // Format for better readability
+                                if (trimmedLine.length > 0 && trimmedLine.length < 500) {
+                                    // Avoid exact duplicates
+                                    const contentPreview = trimmedLine.substring(0, 200);
+                                    const isDuplicate = instances.some(inst => 
+                                        inst.content === contentPreview || 
+                                        (inst.content.length > 50 && contentPreview.includes(inst.content.substring(0, 50)))
+                                    );
+                                    
+                                    if (!isDuplicate) {
+                                        instances.push({
+                                            lineNumber: fileLineNumber || (i + 1),
+                                            file: currentFile || null,
+                                            content: contentPreview + (trimmedLine.length > 200 ? '...' : ''),
+                                            pattern: pattern,
+                                            isSmali: isSmaliContent,
+                                            isSource: isSourceFile
+                                        });
+                                    }
+                                    break; // One instance per line
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                return { ...check, detected: matchedPatterns.length > 0, matchedPatterns, instances };
+            });
+        }
+
+### extractEndpoints [function] refs-> extractEndpoints, extractedEndpoints
+function extractEndpoints(content) {
+            const endpoints = new Map();
+            
+            // HTTP/HTTPS URLs
+            const httpRegex = /https?:\/\/[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+(?::\d+)?(?:\/[^\s"'<>\\]*)?/gi;
+            (content.match(httpRegex) || []).forEach(url => {
+                const clean = url.replace(/['"\\<>)\]}]+$/, '').trim();
+                if (clean.length > 10 && !['schemas.android.com', 'www.w3.org', 'xmlpull.org'].some(b => clean.includes(b))) {
+                    let type = 'http';
+                    let category = 'HTTP/S';
+                    
+                    // Categorize
+                    if (clean.includes('/api/') || clean.includes('/v1/') || clean.includes('/v2/') || clean.includes('/rest/')) {
+                        type = 'api';
+                        category = 'API';
+                    } else if (clean.includes('amazonaws.com') || clean.includes('googleapis.com') || clean.includes('azure.com') || clean.includes('firebaseio.com')) {
+                        type = 'cloud';
+                        category = 'Cloud';
+                    }
+                    
+                    endpoints.set(clean, { url: clean, category, type });
+                }
+            });
+            
+            // WebSocket URLs
+            const wsRegex = /wss?:\/\/[a-zA-Z0-9][-a-zA-Z0-9]*(?:\.[a-zA-Z0-9][-a-zA-Z0-9]*)+(?::\d+)?(?:\/[^\s"'<>\\]*)?/gi;
+            (content.match(wsRegex) || []).forEach(url => {
+                const clean = url.replace(/['"\\<>)\]}]+$/, '').trim();
+                if (clean.length > 10) {
+                    endpoints.set(clean, { url: clean, category: 'WebSocket', type: 'websocket' });
+                }
+            });
+            
+            // Deep Links
+            const deepLinkRegex = /([a-z][a-z0-9+\-.]*):\/\/[^\s"'<>\\]+/gi;
+            (content.match(deepLinkRegex) || []).forEach(url => {
+                const clean = url.replace(/['"\\<>)\]}]+$/, '').trim();
+                const scheme = clean.split(':')[0].toLowerCase();
+                if (!['http', 'https', 'ws', 'wss', 'file', 'ftp', 'mailto'].includes(scheme) && clean.length > 10) {
+                    endpoints.set(clean, { url: clean, category: 'Deep Link', type: 'deeplink' });
+                }
+            });
+            
+            // IP Addresses with ports
+            const ipRegex = /\b(?:https?:\/\/)?(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?::(\d+))?(?:\/[^\s"'<>\\]*)?\b/gi;
+            (content.match(ipRegex) || []).forEach(url => {
+                const clean = url.replace(/['"\\<>)\]}]+$/, '').trim();
+                if (clean.length > 7) {
+                    endpoints.set(clean, { url: clean, category: 'IP Address', type: 'ip' });
+                }
+            });
+            
+            extractedEndpoints = Array.from(endpoints.values());
+            return extractedEndpoints;
+        }
+
+### escapeHtml [function] refs-> escapeHtml
+function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+### copyToClipboard [function] refs-> copyToClipboard
+function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const n = document.createElement('div');
+                n.className = 'fixed bottom-4 right-4 bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-lg z-50 fade-in';
+                n.textContent = 'Copied!';
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 2000);
+            });
+        }
