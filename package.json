@@ -22,7 +22,9 @@
     "test:gaps": "node tools/test-newchecks.cjs && node tools/test-newchecks2.cjs",
     "test:theme": "node tools/test-theme.cjs",
     "verify:freeze": "node verify-freeze.cjs",
-    "verify:history": "node verify-history.cjs"
+    "verify:history": "node verify-history.cjs",
+    "deploy": "npm run build && wrangler deploy",
+    "cf:preview": "npm run build && wrangler dev"
   },
   "keywords": [
     "android",
@@ -37,8 +39,10 @@
     "sql.js": "^1.14.2"
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.64.0",
     "acorn": "^8.19.0",
     "acorn-walk": "^8.3.5",
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "wrangler": "^4.151.3"
   }
 }
